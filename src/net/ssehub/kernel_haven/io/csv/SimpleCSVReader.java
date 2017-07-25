@@ -57,6 +57,8 @@ public class SimpleCSVReader {
      * Creates a new CSV reader for the given input file with default separator.
      * If first line contains a delimiter specification, this specification will be ignored.
      * @param inputFile The file to read.
+     * @param delimiter The delimiter to use to separate distinct values/cells from each other. This will overwrite
+     * a <tt>sep=</tt> specification.
      * 
      * @throws FileNotFoundException if the file does not exist, is a directory rather than a regular file,
      *     or for some other reason cannot be opened for reading.
