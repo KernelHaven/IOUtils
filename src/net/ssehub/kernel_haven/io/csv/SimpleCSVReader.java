@@ -4,15 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.List;
-
-import org.apache.commons.io.FileUtils;
 
 import com.opencsv.CSVReader;
 import com.opencsv.ICSVParser;
-
-import net.ssehub.kernel_haven.util.Logger;
 
 /**
  * A simplistic CSV reader, based on <a href="http://opencsv.sourceforge.net/">http://opencsv.sourceforge.net/</a>.
@@ -35,15 +30,7 @@ public class SimpleCSVReader {
         // Checks if file exists at all
         FileReader fReader = new FileReader(inputFile);
         
-        Character separator = null;
-        try {
-            String line = FileUtils.readLines(inputFile, Charset.defaultCharset()).get(0);
-            if (line != null && line.startsWith("sep")) {
-                separator = line.charAt(line.length() - 1);
-            }
-        } catch (IOException e) {
-            Logger.get().logWarning("Error occured while trying to determine delimiter of CSV file: " + e.getMessage());
-        }
+        Character separator = CSVUtils.determineSeparator(inputFile);
         
         if (null != separator) {
             // Skip first line and use specified separator
@@ -67,15 +54,7 @@ public class SimpleCSVReader {
         // Checks if file exists at all
         FileReader fReader = new FileReader(inputFile);
         
-        Character separator = null;
-        try {
-            String line = FileUtils.readLines(inputFile, Charset.defaultCharset()).get(0);
-            if (line != null && line.startsWith("sep")) {
-                separator = line.charAt(line.length() - 1);
-            }
-        } catch (IOException e) {
-            Logger.get().logWarning("Error occured while trying to determine delimiter of CSV file: " + e.getMessage());
-        }
+        Character separator = CSVUtils.determineSeparator(inputFile);
         
         if (null != separator) {
             // Skip first line, but use specified delimiter

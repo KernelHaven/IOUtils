@@ -54,8 +54,7 @@
 
 	<target name="jar">
 		<jar destfile="${jar.dir}/${jar.filename}" basedir="${classes.dir}" excludes="**/*Test.class, **/*Tests.class, **/package-info.class">
-			<zipgroupfileset dir="lib" includes="opencsv-3.10.jar"/>
-			<zipgroupfileset dir="lib" includes="commons-io-2.5.jar"/>
+			<zipgroupfileset dir="lib/include" includes="*.jar"/>
 		</jar>
 	</target>
 
