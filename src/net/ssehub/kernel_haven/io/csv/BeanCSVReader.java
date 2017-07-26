@@ -45,6 +45,29 @@ public class BeanCSVReader<R> {
     }
     
     /**
+     * Default constructor of this reader.
+     * @param inputFile The file to read.
+     * @param beanClass The annotated bean, which specifies the structure of the CSV-file to be parsed.
+     * @param separator Optional specification of a delimiter, if <tt>null</tt> a comma will be used.
+     * 
+     * @throws FileNotFoundException if the file does not exist, is a directory rather than a regular file,
+     *     or for some other reason cannot be opened for reading.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public BeanCSVReader(File inputFile, Class<R> beanClass, Character separator) throws FileNotFoundException {
+        // Checks if file exists at all
+        FileReader fReader = new FileReader(inputFile);
+        
+        if (null != separator) {
+            // Skip first line and use specified separator
+            reader = new CsvToBeanBuilder(fReader).withType(beanClass).withSeparator(separator).withSkipLines(1)
+                    .build();
+        } else {
+            reader = new CsvToBeanBuilder(fReader).withType(beanClass).build();
+        }
+    }
+    
+    /**
      * Parses the input based on parameters already set through other methods.
      * @return A list of populated beans based on the input
      * @throws IllegalStateException In case of errors.
