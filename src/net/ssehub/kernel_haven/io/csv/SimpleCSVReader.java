@@ -1,5 +1,6 @@
 package net.ssehub.kernel_haven.io.csv;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -14,7 +15,7 @@ import com.opencsv.ICSVParser;
  * @author El-Sharkawy
  *
  */
-public class SimpleCSVReader {
+public class SimpleCSVReader implements Closeable {
     
     private CSVReader reader;
     
@@ -85,6 +86,11 @@ public class SimpleCSVReader {
      */
     public List<String[]> readAll() throws IOException {
         return reader.readAll();
+    }
+
+    @Override
+    public void close() throws IOException {
+        reader.close();
     }
 
 }

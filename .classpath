@@ -9,6 +9,11 @@
 	<classpathentry kind="lib" path="lib/include/commons-logging-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/include/opencsv-3.10.jar" sourcepath="lib/opencsv-3.10-sources.jar"/>
 	<classpathentry kind="lib" path="lib/include/commons-collections-3.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/include/poi-3.16.jar" sourcepath="lib/poi-src-3.16-20170419.zip"/>
+	<classpathentry kind="lib" path="lib/include/poi-ooxml-3.16.jar" sourcepath="lib/poi-src-3.16-20170419.zip"/>
+	<classpathentry kind="lib" path="lib/include/poi-ooxml-schemas-3.16.jar"/>
+	<classpathentry kind="lib" path="lib/include/xmlbeans-2.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/include/commons-collections4-4.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/KernelHaven"/>
 	<classpathentry kind="output" path="bin"/>

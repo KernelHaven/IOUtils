@@ -10,7 +10,9 @@ import org.junit.runners.Suite.SuiteClasses;
  *
  */
 @RunWith(Suite.class)
-@SuiteClasses({SimpleCSVReaderTest.class})
+@SuiteClasses({
+    BeanCSVReaderTest.class,
+    SimpleCSVReaderTest.class})
 public class AllCSVTests {
 
 }

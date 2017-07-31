@@ -24,6 +24,7 @@ public class SimpleCSVReaderTest {
     public void testFileWithDelimiter() throws IOException {
         SimpleCSVReader reader = new SimpleCSVReader(new File(AllTests.TESTDATA, "CSV_with_Separator.csv"));
         List<String[]> contents = reader.readAll();
+        reader.close();
         
         Assert.assertNotNull("Contents of file wasn't read at all.", contents);
         Assert.assertEquals("Unexpected number of rows detected.", 3, contents.size());

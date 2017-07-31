@@ -7,6 +7,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import net.ssehub.kernel_haven.io.csv.AllCSVTests;
+import net.ssehub.kernel_haven.io.excel.AllExcelTests;
 
 /**
  * Test suite for the whole plug-in.
@@ -14,7 +15,9 @@ import net.ssehub.kernel_haven.io.csv.AllCSVTests;
  *
  */
 @RunWith(Suite.class)
-@SuiteClasses({AllCSVTests.class})
+@SuiteClasses({
+    AllCSVTests.class,
+    AllExcelTests.class})
 public class AllTests {
     
     public static final File TESTDATA = new File("testdata");
