@@ -18,11 +18,11 @@ public class SimpleXLSXReaderTest {
     public void testGroupedRows() throws IllegalStateException, IOException, FormatException {
         File inputFile = new File(AllTests.TESTDATA, "GroupedValues.xlsx");
         SimpleXLSXReader reader = new SimpleXLSXReader(inputFile, true);
-        List<Sheet> sheets = reader.readAll();
+        List<ReadonlySheet> sheets = reader.readAll();
         reader.close();
         
         Assert.assertEquals(1, sheets.size());
-        Sheet sheet = sheets.get(0);
+        ReadonlySheet sheet = sheets.get(0);
         Assert.assertEquals("Test Sheet", sheet.getSheetName());
         
         int rows = 0;

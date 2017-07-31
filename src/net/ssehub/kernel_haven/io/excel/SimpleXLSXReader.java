@@ -66,8 +66,8 @@ public class SimpleXLSXReader implements Closeable {
      * @return The sheets of the Excel document.
      * @throws IOException If an I/O error occurs during the {@link #close()} method.s
      */
-    public List<Sheet> readAll() throws IOException {
-        List<Sheet> result = new ArrayList<>();
+    public List<ReadonlySheet> readAll() throws IOException {
+        List<ReadonlySheet> result = new ArrayList<>();
         Iterator<org.apache.poi.ss.usermodel.Sheet> itr = wb.iterator();
         while (itr.hasNext()) {
             org.apache.poi.ss.usermodel.Sheet sheet = itr.next();
@@ -87,7 +87,7 @@ public class SimpleXLSXReader implements Closeable {
      * @throws IllegalArgumentException if the index is out of range (index
      *            &lt; 0 || index &gt;= getNumberOfSheets()).
      */
-    public Sheet readSheet(int index) {
+    public ReadonlySheet readSheet(int index) {
         org.apache.poi.ss.usermodel.Sheet sheet = wb.getSheetAt(index);
         
         return readSheet(sheet);
@@ -98,8 +98,8 @@ public class SimpleXLSXReader implements Closeable {
      * @param sheet The sheet of the Excel document to read.
      * @return The read sheet, should not be <tt>null</tt>.
      */
-    private Sheet readSheet(org.apache.poi.ss.usermodel.Sheet sheet) {
-        Sheet result = new Sheet(sheet.getSheetName());
+    private ReadonlySheet readSheet(org.apache.poi.ss.usermodel.Sheet sheet) {
+        ReadonlySheet result = new ReadonlySheet(sheet.getSheetName());
         
         Iterator<Row> rowIterator = sheet.rowIterator();
         Deque<Integer> groupedRows = new ArrayDeque<>();

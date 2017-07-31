@@ -11,7 +11,7 @@ import java.util.List;
  * @author El-Sharkawy
  *
  */
-public class Sheet implements Iterable<Object[]> {
+public class ReadonlySheet implements Iterable<Object[]> {
     private String sheetName;
     private List<Object[]> contents = new ArrayList<>();
     private List<Group> groupedRows = new ArrayList<>();
@@ -20,7 +20,7 @@ public class Sheet implements Iterable<Object[]> {
      * Constructor for a named sheet.
      * @param sheetName The name of the sheet.
      */
-    Sheet(String sheetName) {
+    ReadonlySheet(String sheetName) {
         this.sheetName = sheetName;
     }
     
