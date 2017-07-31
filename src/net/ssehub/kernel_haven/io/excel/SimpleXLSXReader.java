@@ -28,8 +28,8 @@ public class SimpleXLSXReader implements Closeable {
     private boolean ignoreEmptyRows;
     
     /**
-     * 
-     * @param inputFile
+     * Default constructor for reading a XSLX document. Will also consider empty lines during reading.
+     * @param inputFile An XLSX document, which shall be parsed.
      * @throws IOException if an error occurs while reading the data
      * @throws FormatException if the contents of the file cannot be parsed
      * @throws IllegalStateException If the workbook given is password protected
@@ -39,8 +39,10 @@ public class SimpleXLSXReader implements Closeable {
     }
     
     /**
-     * 
-     * @param inputFile
+     * Constructor for reading a XSLX document. The second parameter may be used to specify whether empty lines shall
+     * be considered.
+     * @param inputFile An XLSX document, which shall be parsed.
+     * @param ignoreEmptyRows <tt>true</tt> empty rows will be skipped, <tt>false</tt> all lines will be read.
      * @throws IOException if an error occurs while reading the data
      * @throws FormatException if the contents of the file cannot be parsed
      * @throws IllegalStateException If the workbook given is password protected
