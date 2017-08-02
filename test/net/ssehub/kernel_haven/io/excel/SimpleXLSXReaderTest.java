@@ -17,7 +17,7 @@ public class SimpleXLSXReaderTest {
     @Test
     public void testGroupedRows() throws IllegalStateException, IOException, FormatException {
         File inputFile = new File(AllTests.TESTDATA, "GroupedValues.xlsx");
-        SimpleXLSXReader reader = new SimpleXLSXReader(inputFile, true);
+        SimpleExcelReader reader = new SimpleExcelReader(inputFile, true);
         List<ReadonlySheet> sheets = reader.readAll();
         reader.close();
         

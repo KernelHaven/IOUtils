@@ -18,11 +18,11 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import net.ssehub.kernel_haven.util.FormatException;
 
 /**
- * A simplistic reader for reading Excel documents in XLSX format.
+ * A simplistic reader for reading Excel documents in <tt>XLSX</tt> or <tt>XLS</tt> format.
  * @author El-Sharkawy
  *
  */
-public class SimpleXLSXReader implements Closeable {
+public class SimpleExcelReader implements Closeable {
     
     private Workbook wb;
     private boolean ignoreEmptyRows;
@@ -34,7 +34,7 @@ public class SimpleXLSXReader implements Closeable {
      * @throws FormatException if the contents of the file cannot be parsed
      * @throws IllegalStateException If the workbook given is password protected
      */
-    public SimpleXLSXReader(File inputFile) throws IOException, IllegalStateException, FormatException {
+    public SimpleExcelReader(File inputFile) throws IOException, IllegalStateException, FormatException {
         this(inputFile, false);
     }
     
@@ -47,7 +47,7 @@ public class SimpleXLSXReader implements Closeable {
      * @throws FormatException if the contents of the file cannot be parsed
      * @throws IllegalStateException If the workbook given is password protected
      */
-    public SimpleXLSXReader(File inputFile, boolean ignoreEmptyRows) throws IOException, IllegalStateException,
+    public SimpleExcelReader(File inputFile, boolean ignoreEmptyRows) throws IOException, IllegalStateException,
         FormatException {
         
         this.ignoreEmptyRows = ignoreEmptyRows;
