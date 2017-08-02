@@ -48,6 +48,39 @@ public class ReadonlySheet implements Iterable<Object[]> {
     public List<Group> getGroupedRows() {
         return Collections.unmodifiableList(groupedRows);
     }
+    
+    /**
+     * Returns all grouped rows which are relevant for the specified index.
+     * @param rowIndex A 0-based index for which the groups shall be returned.
+     * @return A list of grouped rows, may be empty.
+     */
+    public List<Group> getRowGroups(int rowIndex) {
+        List<Group> relevantGroups = new ArrayList<>();
+        for (Group rowGroup : groupedRows) {
+            if (rowGroup.getStartIndex() <= rowIndex && rowGroup.getEndIndex() >= rowIndex) {
+                relevantGroups.add(rowGroup);
+            }
+        }
+        
+        return Collections.unmodifiableList(relevantGroups);
+    }
+    
+    /**
+     * Returns the number of stored rows.
+     * @return A value &ge; 0.
+     */
+    public int getNumberOfRows() {
+        return contents.size();
+    }
+    
+    /**
+     * Returns the specified row.
+     * @param rowIndex A 0-based index. 
+     * @return The contents of the specified row.
+     */
+    public Object[] getRow(int rowIndex) {
+        return contents.get(rowIndex);
+    }
 
     @Override
     public Iterator<Object[]> iterator() {
