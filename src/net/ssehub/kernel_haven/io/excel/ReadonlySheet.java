@@ -51,6 +51,8 @@ public class ReadonlySheet implements Iterable<Object[]> {
     
     /**
      * Returns all grouped rows which are relevant for the specified index.
+     * The elements are sorted in descending order of the start index, thus, the most inenr group comes first,
+     * the most outer group comes last. 
      * @param rowIndex A 0-based index for which the groups shall be returned.
      * @return A list of grouped rows, may be empty.
      */
@@ -61,6 +63,9 @@ public class ReadonlySheet implements Iterable<Object[]> {
                 relevantGroups.add(rowGroup);
             }
         }
+        
+        // Sorts elements by start index in descending order
+        relevantGroups.sort((g1, g2) -> Integer.compare(g2.getStartIndex(), g1.getStartIndex()));
         
         return Collections.unmodifiableList(relevantGroups);
     }
