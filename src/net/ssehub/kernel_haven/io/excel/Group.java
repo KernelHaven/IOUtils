@@ -34,4 +34,10 @@ public class Group {
     public int getEndIndex() {
         return endIndex;
     }
+    
+    @Override
+    public String toString() {
+        // For Debugging only
+        return "[" + startIndex + ";" + endIndex + "]";
+    }
 }

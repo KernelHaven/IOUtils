@@ -112,10 +112,10 @@ public class SimpleExcelReader implements Closeable {
             
             if (currentGroupLevel > groupLevel) {
                 // Current row is sub element of the row before
-                groupedRows.addFirst(previousRow);
+                groupedRows.addFirst(previousRow + 1);
             } else if (currentGroupLevel < groupLevel) {
                 // Current row does not belong to the current row anymore, save last grouping
-                Integer groupingStart = groupedRows.peekFirst();
+                Integer groupingStart = groupedRows.pollFirst();
                 result.addRowGrouping(groupingStart, previousRow);
             }
             groupLevel = currentGroupLevel;
@@ -151,6 +151,12 @@ public class SimpleExcelReader implements Closeable {
                 result.addRow(rowContents.toArray());
             }
             previousRow++;
+        }
+        
+        if (groupLevel > 0) {
+            // Group ends at the last line
+            Integer groupingStart = groupedRows.pollFirst();
+            result.addRowGrouping(groupingStart, previousRow - 1);
         }
         
         return result;

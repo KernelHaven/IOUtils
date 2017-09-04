@@ -37,7 +37,7 @@ public class ReadonlySheet implements Iterable<Object[]> {
      * @param rowStart The first row of a group (0-based index).
      * @param rowEnd The last row of a group (0-based index).
      */
-    public void addRowGrouping(int rowStart, int rowEnd) {
+    void addRowGrouping(int rowStart, int rowEnd) {
         groupedRows.add(new Group(rowStart, rowEnd));
     }
     
