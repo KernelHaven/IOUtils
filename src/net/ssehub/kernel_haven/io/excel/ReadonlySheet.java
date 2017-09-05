@@ -113,4 +113,10 @@ public class ReadonlySheet implements Iterable<Object[]> {
     public String getSheetName() {
         return sheetName;
     }
+    
+    @Override
+    public String toString() {
+        // For debugging only
+        return contents.toString();
+    }
 }

@@ -156,7 +156,7 @@ public class SimpleExcelReader implements Closeable {
         if (groupLevel > 0) {
             // Group ends at the last line
             Integer groupingStart = groupedRows.pollFirst();
-            result.addRowGrouping(groupingStart, previousRow - 1);
+            result.addRowGrouping(groupingStart, previousRow);
         }
         
         return result;

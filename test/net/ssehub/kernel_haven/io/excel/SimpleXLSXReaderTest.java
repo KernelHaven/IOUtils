@@ -11,9 +11,19 @@ import org.junit.Test;
 import net.ssehub.kernel_haven.io.AllTests;
 import net.ssehub.kernel_haven.util.FormatException;
 
-
+/**
+ * Tests the {@link SimpleXLSXReaderTest}.
+ * @author El-Sharkawy
+ *
+ */
 public class SimpleXLSXReaderTest {
     
+    /**
+     * Tests the correct retrieval of grouped rows.
+     * @throws IllegalStateException Should not occur, otherwise the tested Excel file is password protected.
+     * @throws IOException Should not occur, otherwise the tested Excel document cannot be opened.
+     * @throws FormatException Should not occur, otherwise the tested Excel cannot be parsed
+     */
     @Test
     public void testGroupedRows() throws IllegalStateException, IOException, FormatException {
         File inputFile = new File(AllTests.TESTDATA, "GroupedValues.xlsx");
@@ -36,11 +46,20 @@ public class SimpleXLSXReaderTest {
         List<Group> groupedRows = sheet.getGroupedRows();
         Assert.assertEquals(2, groupedRows.size());
         Group firstGroup = groupedRows.get(0);
-        Assert.assertEquals(1, firstGroup.getStartIndex());
-        Assert.assertEquals(2, firstGroup.getEndIndex());
+        assertGroup(firstGroup, 1, 2);
         Group secondGroup = groupedRows.get(1);
-        Assert.assertEquals(3, secondGroup.getStartIndex());
-        Assert.assertEquals(5, secondGroup.getEndIndex());
+        assertGroup(secondGroup, 4, 5);
+    }
+
+    /**
+     * Asserts the correct setting of the tested group.
+     * @param group The group to test.
+     * @param startIndex The expected first row of the group (starts a 0).
+     * @param endIndex The expected last row of the group (starts a 0).
+     */
+    private void assertGroup(Group group, int startIndex, int endIndex) {
+        Assert.assertEquals("Start index for Group " + group + " not as expected.", startIndex, group.getStartIndex());
+        Assert.assertEquals("End index for Group " + group + " not as expected.", endIndex, group.getEndIndex());
     }
 
 }
