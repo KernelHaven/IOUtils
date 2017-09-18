@@ -110,15 +110,27 @@ public class SimpleExcelReader implements Closeable {
             Row currentRow = rowIterator.next();
             int currentGroupLevel = currentRow.getOutlineLevel();
             
-            if (currentGroupLevel > groupLevel) {
-                // Current row is sub element of the row before
-                groupedRows.addFirst(previousRow + 1);
-            } else if (currentGroupLevel < groupLevel) {
-                // Current row does not belong to the current row anymore, save last grouping
-                Integer groupingStart = groupedRows.pollFirst();
-                result.addRowGrouping(groupingStart, previousRow);
+            if (currentGroupLevel != groupLevel) {
+                while (currentGroupLevel > groupLevel) {
+                    // Current row is sub element of the row before
+                    groupedRows.addFirst(previousRow + 1);
+                    groupLevel++;
+                }
+                while (currentGroupLevel < groupLevel) {
+                    // Current row does not belong to the current row anymore, save last grouping
+                    Integer groupingStart = groupedRows.pollFirst();
+                    result.addRowGrouping(groupingStart, previousRow);
+                    groupLevel--;
+                }
             }
-            groupLevel = currentGroupLevel;
+            
+//            if (currentGroupLevel > groupLevel) {
+//            } else if (currentGroupLevel < groupLevel) {
+//                // Current row does not belong to the current row anymore, save last grouping
+//                Integer groupingStart = groupedRows.pollFirst();
+//                result.addRowGrouping(groupingStart, previousRow);
+//            }
+//            groupLevel = currentGroupLevel;
             
             Iterator<Cell> cellIterator = currentRow.iterator();
             boolean isEmpty = true;
@@ -153,10 +165,12 @@ public class SimpleExcelReader implements Closeable {
             previousRow++;
         }
         
-        if (groupLevel > 0) {
+        while (groupLevel > 0) {
             // Group ends at the last line
             Integer groupingStart = groupedRows.pollFirst();
-            result.addRowGrouping(groupingStart, previousRow);
+            int lastRow = Math.min(previousRow, result.getNumberOfRows() - 1);
+            result.addRowGrouping(groupingStart, lastRow);
+            groupLevel--;
         }
         
         return result;

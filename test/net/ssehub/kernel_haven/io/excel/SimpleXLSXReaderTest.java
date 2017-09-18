@@ -27,13 +27,7 @@ public class SimpleXLSXReaderTest {
     @Test
     public void testGroupedRows() throws IllegalStateException, IOException, FormatException {
         File inputFile = new File(AllTests.TESTDATA, "GroupedValues.xlsx");
-        SimpleExcelReader reader = new SimpleExcelReader(inputFile, true);
-        List<ReadonlySheet> sheets = reader.readAll();
-        reader.close();
-        
-        Assert.assertEquals(1, sheets.size());
-        ReadonlySheet sheet = sheets.get(0);
-        Assert.assertEquals("Test Sheet", sheet.getSheetName());
+        ReadonlySheet sheet = loadTestSheet(inputFile, 0);
         
         int rows = 0;
         Iterator<Object[]> itr = sheet.iterator();
@@ -49,6 +43,76 @@ public class SimpleXLSXReaderTest {
         assertGroup(firstGroup, 1, 2);
         Group secondGroup = groupedRows.get(1);
         assertGroup(secondGroup, 4, 5);
+    }
+    
+    /**
+     * Tests the groups point to existing rows and won't cause {@link IndexOutOfBoundsException}s.
+     * @throws IllegalStateException Should not occur, otherwise the tested Excel file is password protected.
+     * @throws IOException Should not occur, otherwise the tested Excel document cannot be opened.
+     * @throws FormatException Should not occur, otherwise the tested Excel cannot be parsed
+     */
+    @Test
+    public void testGroupedRowsAccess() throws IllegalStateException, IOException, FormatException {
+        File inputFile = new File(AllTests.TESTDATA, "GroupedValues2.xlsx");
+        ReadonlySheet sheet = loadTestSheet(inputFile, 0);
+        
+        int rows = 0;
+        Iterator<Object[]> itr = sheet.iterator();
+        while (itr.hasNext()) {
+            rows++;
+            itr.next();
+        }
+        Assert.assertEquals(6, rows);
+        
+        List<Group> groupedRows = sheet.getGroupedRows();
+        Assert.assertEquals(3, groupedRows.size());
+        for (Group group : groupedRows) {
+            Object[] row = null;
+            
+            int firstIndex = group.getStartIndex();
+            try {
+                row = sheet.getRow(firstIndex);
+                Assert.assertNotNull("Illegal index for first row index: " + firstIndex, row);
+            } catch (IndexOutOfBoundsException exc) {
+                Assert.fail("Group covers non existing rows, row " + firstIndex + " is probably smaller than 0: "
+                    + exc.getMessage());
+            }
+            
+            int lastIndex = group.getEndIndex();
+            try {
+                row = sheet.getRow(lastIndex);
+                Assert.assertNotNull("Illegal index for last row index: " + lastIndex, row);
+            } catch (IndexOutOfBoundsException exc) {
+                Assert.fail("Group covers non existing rows, row " + lastIndex + " is greater than "
+                    + sheet.getNumberOfRows() + ": " + exc.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Loads the <tt>Test Sheet</tt>.
+     * @param inputFile The document to test.
+     * @param sheetNo The sheet, which shall be used for testing (usually 0).
+     * @return The specified sheet, which shall be used for testing.
+     */
+    private ReadonlySheet loadTestSheet(File inputFile, int sheetNo) {
+        List<ReadonlySheet> sheets = null;
+        try {
+            SimpleExcelReader reader = new SimpleExcelReader(inputFile, true);
+            sheets = reader.readAll();
+            reader.close();
+        } catch (IOException exc) {
+            Assert.fail("IO Exception occured during close operation: " + exc.getMessage());
+        } catch (IllegalStateException exc) {
+            Assert.fail("IllegalStateException while creating the reader: " + exc.getMessage());
+        } catch (FormatException exc) {
+            Assert.fail("FormatException while reading the document: " + exc.getMessage());
+        }
+        
+        Assert.assertEquals(1, sheets.size());
+        ReadonlySheet sheet = sheets.get(sheetNo);
+        Assert.assertEquals("Test Sheet", sheet.getSheetName());
+        return sheet;
     }
 
     /**
