@@ -15,12 +15,12 @@ public class ReadonlySheet implements Iterable<Object[]> {
     private String sheetName;
     private List<Object[]> contents = new ArrayList<>();
     private List<Group> groupedRows = new ArrayList<>();
-    
+        
     /**
      * Constructor for a named sheet.
      * @param sheetName The name of the sheet.
      */
-    ReadonlySheet(String sheetName) {
+    protected ReadonlySheet(String sheetName) {
         this.sheetName = sheetName;
     }
     
@@ -28,7 +28,7 @@ public class ReadonlySheet implements Iterable<Object[]> {
      * Adds a new row to the sheet.
      * @param rowContents The values of the row, should not be <tt>null</tt>.
      */
-    void addRow(Object[] rowContents) {
+    protected void addRow(Object[] rowContents) {
         contents.add(rowContents);
     }
     
