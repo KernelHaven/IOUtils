@@ -61,7 +61,7 @@ public class SimpleCSVReader implements Closeable {
             // Skip first line, but use specified delimiter
             reader = new CSVReader(fReader, delimiter, ICSVParser.DEFAULT_QUOTE_CHARACTER, 1);
         } else {
-            reader = new CSVReader(fReader);
+            reader = new CSVReader(fReader, delimiter);
         }
     }
     

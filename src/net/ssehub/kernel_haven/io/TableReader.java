@@ -45,9 +45,10 @@ public class TableReader {
     
     private File file;
     private FILE_TYPE type;
+    private Character csvDelimiter;
     
     /**
-     * Sole constructor for this class.
+     * Default constructor for this class.
      * @param file The file to be read (either an Excel file or a CSV file).
      * @throws IOException If the specified file does not exist.
      * @throws IllegalArgumentException If the specified file is neither an an Excel file or a CSV file.
@@ -62,7 +63,7 @@ public class TableReader {
         if (-1 == pos) {
             throw new IllegalArgumentException("Could not determine file extension of " + fileName);
         }
-        String extension = fileName.substring(pos).toLowerCase();
+        String extension = fileName.substring(pos + 1).toLowerCase();
         if ("csv".equals(extension)) {
             type = FILE_TYPE.CSV;
         } else if ("xls".equals(extension) || "xlsx".equals(extension)) {
@@ -70,6 +71,18 @@ public class TableReader {
         } else {
             throw new IllegalArgumentException("File \"" + fileName + "\" is neither a CSV nor an Excel file.");
         }
+        csvDelimiter = null;
+    }
+    
+    /**
+     * Constructor to specify a delimiter/separator for entries in a CSV file.
+     * @param file The file to be read (either an Excel file or a CSV file).
+     * @throws IOException If the specified file does not exist.
+     * @throws IllegalArgumentException If the specified file is neither an an Excel file or a CSV file.
+     */
+    public TableReader(File file, char csvDelimiter) throws IOException, IllegalArgumentException {
+        this(file);
+        this.csvDelimiter = csvDelimiter;
     }
 
     /**
@@ -88,10 +101,12 @@ public class TableReader {
             result = excelReader.readAll();
             break;
         case CSV:
-            SimpleCSVReader csvReader = new SimpleCSVReader(file);
+            SimpleCSVReader csvReader = (null == csvDelimiter) ? new SimpleCSVReader(file)
+                : new SimpleCSVReader(file, csvDelimiter);
             List<String[]> content = csvReader.readAll();
             result = new ArrayList<>();
             result.add(new Sheet(file.getName(), content));
+            break;
         default:
             throw new IllegalStateException("Unsupported file type: " + file.getName());
         }
