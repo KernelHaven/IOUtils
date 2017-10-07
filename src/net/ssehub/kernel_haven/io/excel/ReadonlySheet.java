@@ -10,7 +10,9 @@ import java.util.List;
  * This sheet is designed to be read-only.
  * @author El-Sharkawy
  *
+ * @deprecated Use {@link ExcelBook} instead.
  */
+@Deprecated
 public class ReadonlySheet implements Iterable<Object[]> {
     private String sheetName;
     private List<Object[]> contents = new ArrayList<>();

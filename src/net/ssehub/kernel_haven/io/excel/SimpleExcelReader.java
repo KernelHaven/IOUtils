@@ -20,8 +20,11 @@ import net.ssehub.kernel_haven.util.FormatException;
 /**
  * A simplistic reader for reading Excel documents in <tt>XLSX</tt> or <tt>XLS</tt> format.
  * @author El-Sharkawy
+ * 
+ * @deprecated Use {@link ExcelBook} instead.
  *
  */
+@Deprecated
 public class SimpleExcelReader implements Closeable {
     
     private Workbook wb;

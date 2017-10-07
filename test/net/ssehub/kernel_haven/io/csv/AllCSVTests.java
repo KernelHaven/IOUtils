@@ -9,6 +9,8 @@ import org.junit.runners.Suite.SuiteClasses;
  * @author El-Sharkawy
  *
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 @RunWith(Suite.class)
 @SuiteClasses({
     BeanCSVReaderTest.class,

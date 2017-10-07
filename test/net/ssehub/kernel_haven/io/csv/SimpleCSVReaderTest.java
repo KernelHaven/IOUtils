@@ -14,6 +14,7 @@ import net.ssehub.kernel_haven.io.AllTests;
  * @author El-Sharkawy
  *
  */
+@Deprecated
 public class SimpleCSVReaderTest {
 
     /**

@@ -11,7 +11,8 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    SimpleXLSXReaderTest.class})
+    ExcelBookTest.class,
+})
 public class AllExcelTests {
 
 }

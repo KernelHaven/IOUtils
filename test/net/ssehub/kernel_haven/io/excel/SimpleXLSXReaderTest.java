@@ -16,6 +16,7 @@ import net.ssehub.kernel_haven.util.FormatException;
  * @author El-Sharkawy
  *
  */
+@Deprecated
 public class SimpleXLSXReaderTest {
     
     /**

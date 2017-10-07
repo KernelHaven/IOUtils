@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import net.ssehub.kernel_haven.io.csv.AllCSVTests;
 import net.ssehub.kernel_haven.io.excel.AllExcelTests;
 
 /**
@@ -16,8 +15,8 @@ import net.ssehub.kernel_haven.io.excel.AllExcelTests;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    AllCSVTests.class,
-    AllExcelTests.class})
+    AllExcelTests.class
+})
 public class AllTests {
     
     public static final File TESTDATA = new File("testdata");

@@ -2,6 +2,7 @@ package net.ssehub.kernel_haven.io.csv;
 
 import com.opencsv.bean.CsvBindByName;
 
+@Deprecated
 public class VariableValueBean {
     
     @CsvBindByName(column = "Name", required = true)
