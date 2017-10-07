@@ -10,12 +10,17 @@ import net.ssehub.kernel_haven.io.csv.SimpleCSVReader;
 import net.ssehub.kernel_haven.io.excel.ReadonlySheet;
 import net.ssehub.kernel_haven.io.excel.SimpleExcelReader;
 import net.ssehub.kernel_haven.util.FormatException;
+import net.ssehub.kernel_haven.util.io.ITableReader;
+import net.ssehub.kernel_haven.util.io.ITableWriter;
 
 /**
  * Reads from Excel (XLSX, XLS) and CSV files.
  * @author El-Sharkawy
  *
+ * @deprecated Use {@link ITableReader} and {@link ITableWriter} in main infrastructure instead.
+ *
  */
+@Deprecated
 public class TableReader {
     
     /**

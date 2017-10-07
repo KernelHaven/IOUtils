@@ -11,8 +11,11 @@ import net.ssehub.kernel_haven.util.Logger;
 /**
  * Utility functions for CSV file handling.
  * @author El-Sharkawy
+ * 
+ * @deprecated Use classes in main infrastructure instead.
  *
  */
+@Deprecated
 public class CSVUtils {
     
     /**

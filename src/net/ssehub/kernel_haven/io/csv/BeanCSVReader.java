@@ -8,14 +8,20 @@ import java.util.List;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
+import net.ssehub.kernel_haven.util.io.csv.CsvReader;
+
 /**
+ * 
  * Uses a bean to read a CSV file. The bean must be annotated with {@link com.opencsv.bean.CsvBindByName}
  * and/or {@link com.opencsv.bean.CsvBindByPosition} annotations.
  * @param <R> The bean, which shall be used as return type.
  * 
+ * @deprecated Use {@link CsvReader} instead.
+ * 
  * @author El-Sharkawy
  *
  */
+@Deprecated
 public class BeanCSVReader<R> {
     
     private CsvToBean<R> reader;

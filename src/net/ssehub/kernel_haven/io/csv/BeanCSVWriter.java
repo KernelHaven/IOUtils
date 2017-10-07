@@ -11,15 +11,21 @@ import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvException;
 
+import net.ssehub.kernel_haven.util.io.csv.CsvWriter;
+
 /**
+ * 
  * A bean-based CSV writer. Needs a bean, which is annotated with {@link com.opencsv.bean.CsvBindByName}
  * and/or {@link com.opencsv.bean.CsvBindByPosition} annotations to write the CSV file.<br/><br/>
  * 
  * <b><font color="red">Important: </font></b> Use the {@link #close()} method after writing the last entry.
  * @author El-Sharkawy
  *
+ * @deprecated Use {@link CsvWriter} instead.
+ * 
  * @param <D> The bean, which is used as data type for writing the information.
  */
+@Deprecated
 public class BeanCSVWriter<D> implements Closeable {
     
     private Writer fWriter;

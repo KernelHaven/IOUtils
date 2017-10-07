@@ -10,11 +10,16 @@ import java.util.List;
 import com.opencsv.CSVReader;
 import com.opencsv.ICSVParser;
 
+import net.ssehub.kernel_haven.util.io.csv.CsvReader;
+
 /**
  * A simplistic CSV reader, based on <a href="http://opencsv.sourceforge.net/">http://opencsv.sourceforge.net/</a>.
  * @author El-Sharkawy
  *
+ * @deprecated Use {@link CsvReader} instead.
+ *
  */
+@Deprecated
 public class SimpleCSVReader implements Closeable {
     
     private CSVReader reader;
