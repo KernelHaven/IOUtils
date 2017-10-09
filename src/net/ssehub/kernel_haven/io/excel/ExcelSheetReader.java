@@ -3,6 +3,7 @@ package net.ssehub.kernel_haven.io.excel;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -129,6 +130,28 @@ public class ExcelSheetReader implements ITableReader {
     
     public List<Group> getGroupedRows() {
         return groupedRows;
+    }
+    
+    /**
+     * Returns all grouped rows which are relevant for the specified index.
+     * The elements are sorted in descending order of the start index, thus, the most inner group comes first,
+     * the most outer group comes last. 
+     * 
+     * @param rowIndex A 0-based index for which the groups shall be returned.
+     * @return A list of grouped rows, may be empty.
+     */
+    public List<Group> getRowGroups(int rowIndex) {
+        List<Group> relevantGroups = new ArrayList<>();
+        for (Group rowGroup : groupedRows) {
+            if (rowGroup.getStartIndex() <= rowIndex && rowGroup.getEndIndex() >= rowIndex) {
+                relevantGroups.add(rowGroup);
+            }
+        }
+        
+        // Sorts elements by start index in descending order
+        relevantGroups.sort((g1, g2) -> Integer.compare(g2.getStartIndex(), g1.getStartIndex()));
+        
+        return Collections.unmodifiableList(relevantGroups);
     }
     
     @Override
