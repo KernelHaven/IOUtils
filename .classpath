@@ -3,12 +3,9 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="lib/include/commons-beanutils-1.9.3.jar" sourcepath="lib/commons-beanutils-1.9.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/include/commons-io-2.5.jar"/>
 	<classpathentry kind="lib" path="lib/include/commons-lang3-3.6.jar"/>
 	<classpathentry kind="lib" path="lib/include/commons-logging-1.2.jar"/>
-	<classpathentry kind="lib" path="lib/include/opencsv-3.10.jar" sourcepath="lib/opencsv-3.10-sources.jar"/>
-	<classpathentry kind="lib" path="lib/include/commons-collections-3.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/include/poi-3.16.jar" sourcepath="lib/poi-src-3.16-20170419.zip"/>
 	<classpathentry kind="lib" path="lib/include/poi-ooxml-3.16.jar" sourcepath="lib/poi-src-3.16-20170419.zip"/>
 	<classpathentry kind="lib" path="lib/include/poi-ooxml-schemas-3.16.jar"/>
