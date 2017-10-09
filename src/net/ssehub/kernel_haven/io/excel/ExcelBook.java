@@ -170,6 +170,11 @@ public class ExcelBook implements ITableCollection, Closeable {
                     String tmpName = WorkbookUtil.createSafeSheetName(safeName + id);
                     try {
                         sheet = wb.createSheet(tmpName);
+                        /* Add sheets at the front by default
+                         * This is done to show final results at the beginning of document and intermediate results
+                         * at the end of document.
+                         */
+                        wb.setSheetOrder(sheet.getSheetName(), 0);
                     } catch (IllegalArgumentException exc2) {
                         // No action needed
                     }
