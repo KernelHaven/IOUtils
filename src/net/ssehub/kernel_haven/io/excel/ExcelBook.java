@@ -88,7 +88,7 @@ public class ExcelBook implements ITableCollection {
                 /* Using a File object allows for lower memory consumption, while an InputStream requires more memory
                  * as it has to buffer the whole file.
                  */
-                wb = WorkbookFactory.create(destinationFile);
+                wb = WorkbookFactory.create(destinationFile, null, true);
             } catch (InvalidFormatException e) {
                 throw new FormatException(e);
             }
