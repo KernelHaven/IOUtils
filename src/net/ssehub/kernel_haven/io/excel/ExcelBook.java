@@ -1,7 +1,6 @@
 package net.ssehub.kernel_haven.io.excel;
 
 import java.io.BufferedOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,7 +26,7 @@ import net.ssehub.kernel_haven.util.io.ITableCollection;
  * @author Adam
  * @author El-Sharkawy
  */
-public class ExcelBook implements ITableCollection, Closeable {
+public class ExcelBook implements ITableCollection {
     
     private static enum Mode {
         // Add further state if needed
