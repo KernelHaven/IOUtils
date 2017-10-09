@@ -203,4 +203,11 @@ public class ExcelBook implements ITableCollection {
         wb.close();
     }
 
+    @Override
+    public Set<File> getFiles() throws IOException {
+        Set<File> result = new HashSet<>();
+        result.add(destinationFile);
+        return result;
+    }
+
 }
