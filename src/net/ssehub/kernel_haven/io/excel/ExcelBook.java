@@ -182,7 +182,8 @@ public class ExcelBook implements ITableCollection, Closeable {
                 }
             }
             if (null == sheet) {
-                throw new IOException("Could not create sheet \"" + safeName + "\", cause: " + exception.getMessage());
+                String cause = null != exception ? ", cause: " + exception.getMessage() : "";
+                throw new IOException("Could not create sheet \"" + safeName + "\"" + cause);
             }
             return new ExcelSheetWriter(sheet);
         }
