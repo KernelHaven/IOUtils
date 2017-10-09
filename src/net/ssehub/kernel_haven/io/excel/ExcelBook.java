@@ -1,7 +1,9 @@
 package net.ssehub.kernel_haven.io.excel;
 
+import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,10 +15,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.WorkbookUtil;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.io.ITableCollection;
-import net.ssehub.kernel_haven.util.io.ITableWriter;
 
 /**
  * A wrapper around an excel book. A book contains several sheets. The individual sheets can be accessed through
@@ -27,45 +29,70 @@ import net.ssehub.kernel_haven.util.io.ITableWriter;
  */
 public class ExcelBook implements ITableCollection, Closeable {
     
+    private static enum Mode {
+        // Add further state if needed
+        
+        // Existing workbook, which shall not be changed
+        READ_ONLY,
+        
+        // New workbook, read (temporary) data and add new data
+        WRITE_NEW_WB;
+    }
+    
     private Workbook wb;
     
     private boolean ignoreEmptyRows;
+    private Mode mode;
+    private File destinationFile;
     
     /**
-     * Default constructor for reading a XSLX document. Will also consider empty lines during reading.
+     * Default constructor for reading and writing a Excel documents (XLSX, XLS).
+     * Will also consider empty lines during reading.
      * 
-     * @param inputFile An XLSX document, which shall be parsed.
+     * @param destinationFile An Excel document, which shall be parsed (if existing) or be written (if not existing).
      * 
      * @throws IOException if an error occurs while reading the data
      * @throws FormatException if the contents of the file cannot be parsed
      * @throws IllegalStateException If the workbook given is password protected
      */
-    public ExcelBook(File inputFile) throws IOException, IllegalStateException, FormatException {
-        this(inputFile, false);
+    public ExcelBook(File destinationFile) throws IOException, IllegalStateException, FormatException {
+        this(destinationFile, false);
     }
     
     /**
-     * Constructor for reading a XSLX document. The second parameter may be used to specify whether empty lines shall
-     * be considered.
+     * Constructor for reading and writing a Excel documents (XLSX, XLS).
+     * The second parameter may be used to specify whether empty lines shall be considered.
      * 
-     * @param inputFile An XLSX document, which shall be parsed.
+     * @param destinationFile An Excel document, which shall be parsed (if existing) or be written (if not existing).
      * @param ignoreEmptyRows <tt>true</tt> empty rows will be skipped, <tt>false</tt> all lines will be read.
      * 
      * @throws IOException if an error occurs while reading the data
      * @throws FormatException if the contents of the file cannot be parsed
      * @throws IllegalStateException If the workbook given is password protected
      */
-    public ExcelBook(File inputFile, boolean ignoreEmptyRows) throws IOException, IllegalStateException,
+    public ExcelBook(File destinationFile, boolean ignoreEmptyRows) throws IOException, IllegalStateException,
         FormatException {
         
         this.ignoreEmptyRows = ignoreEmptyRows;
-        if (!inputFile.exists()) {
-            throw new IOException(inputFile.getAbsolutePath() + " does not exist.");
-        }
-        try {
-            wb = WorkbookFactory.create(inputFile);
-        } catch (InvalidFormatException e) {
-            throw new FormatException(e);
+        this.destinationFile = destinationFile;
+        if (!destinationFile.exists()) {
+            if (destinationFile.createNewFile()) {
+                mode = Mode.WRITE_NEW_WB;
+                wb = new XSSFWorkbook();
+            } else {
+                throw new IOException("Specified file does not exist and could not be created: "
+                    + destinationFile.getAbsolutePath());
+            }
+        } else {
+            try {
+                mode = Mode.READ_ONLY;
+                /* Using a File object allows for lower memory consumption, while an InputStream requires more memory
+                 * as it has to buffer the whole file.
+                 */
+                wb = WorkbookFactory.create(destinationFile);
+            } catch (InvalidFormatException e) {
+                throw new FormatException(e);
+            }
         }
     }
     
@@ -123,33 +150,50 @@ public class ExcelBook implements ITableCollection, Closeable {
     }
 
     @Override
-    public ITableWriter getWriter(String name) throws IOException {
-        String safeName = WorkbookUtil.createSafeSheetName(name);
-        IllegalArgumentException exception = null;
-        Sheet sheet = null;
-        try {
-            sheet = wb.createSheet(safeName);
-        } catch (IllegalArgumentException exc) {
-            exception = exc;
-            byte id = 0;
-            while (null == sheet && id < Byte.MAX_VALUE) {
-                String tmpName = WorkbookUtil.createSafeSheetName(safeName + id);
-                try {
-                    sheet = wb.createSheet(tmpName);
-                } catch (IllegalArgumentException exc2) {
-                    // No action needed
+    public ExcelSheetWriter getWriter(String name) throws IOException {
+        switch (mode) {
+        case READ_ONLY:
+            throw new UnsupportedOperationException("Sheet was oppened in read only mode: "
+                + destinationFile.getAbsolutePath());
+        case WRITE_NEW_WB:
+            // falls through
+        default:
+            String safeName = WorkbookUtil.createSafeSheetName(name);
+            IllegalArgumentException exception = null;
+            Sheet sheet = null;
+            try {
+                sheet = wb.createSheet(safeName);
+            } catch (IllegalArgumentException exc) {
+                exception = exc;
+                byte id = 0;
+                while (null == sheet && id < Byte.MAX_VALUE) {
+                    String tmpName = WorkbookUtil.createSafeSheetName(safeName + id);
+                    try {
+                        sheet = wb.createSheet(tmpName);
+                    } catch (IllegalArgumentException exc2) {
+                        // No action needed
+                    }
+                    id++;
                 }
-                id++;
             }
+            if (null == sheet) {
+                throw new IOException("Could not create sheet \"" + safeName + "\", cause: " + exception.getMessage());
+            }
+            return new ExcelSheetWriter(sheet);
         }
-        if (null == sheet) {
-            throw new IOException("Could not create sheet \"" + safeName + "\", cause: " + exception.getMessage());
-        }
-        return new ExcelSheetWriter(sheet);
     }
     
     @Override
     public void close() throws IOException {
+        switch (mode) {
+        case WRITE_NEW_WB:
+            BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(destinationFile));
+            wb.write(fileOut);
+        case READ_ONLY:
+            break;
+        default:
+            throw new IllegalStateException("Unexpected close opperation for state: " + mode.name());
+        }
         wb.close();
     }
 

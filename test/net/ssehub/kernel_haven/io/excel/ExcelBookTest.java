@@ -8,7 +8,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import net.ssehub.kernel_haven.io.AllTests;
@@ -21,7 +23,21 @@ import net.ssehub.kernel_haven.util.FormatException;
  * @author Adam
  */
 public class ExcelBookTest {
+    private static final File TMPFOLDER = new File(AllTests.TESTDATA, "tmpFiles");
 
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        if (TMPFOLDER.exists()) {
+            try {
+                FileUtils.deleteDirectory(TMPFOLDER);
+            } catch (IOException e) {
+                Assert.fail("Could not clear temp directory: " + TMPFOLDER.getAbsolutePath());
+            }
+        }
+        
+        TMPFOLDER.mkdirs();
+    }
+    
     /**
      * Tests the correct retrieval of grouped rows.
      * 
@@ -91,6 +107,105 @@ public class ExcelBookTest {
                         + allRows.length + ": " + exc.getMessage());
                 }
             }
+        }
+    }
+    
+    /**
+     * 
+     * @throws IOException if an error occurs while reading the data (Must not occur during testing)
+     * @throws FormatException if the contents of the file cannot be parsed (Must not occur during testing)
+     * @throws IllegalStateException If the workbook given is password protected (Must not occur during testing)
+     */
+    @Test
+    public void testWriteSingleSheet() throws IllegalStateException, IOException, FormatException {
+        File newWorkbook = new File(TMPFOLDER, "testWriteSingleSheet.xlsx");
+        Assert.assertFalse(newWorkbook.exists());
+        String sheetName = "newSheet";
+        
+        // Create empty book
+        ExcelBook book = new ExcelBook(newWorkbook);
+        Assert.assertEquals(0, book.getTableNames().size());
+        
+        // Create first sheet
+        ExcelSheetWriter writer = book.getWriter(sheetName);
+        Assert.assertEquals(1, book.getTableNames().size());
+        Assert.assertTrue(book.getTableNames().contains(sheetName));
+        writer.writeRow("A", "Test");
+        
+        // Write contents to file system
+        book.close();
+        
+        // Test that correct content was written
+        try (ExcelBook writtenBook = new ExcelBook(newWorkbook)) {
+            ExcelSheetReader reader = writtenBook.getReader(sheetName);
+            String[][] content = reader.readFull();
+            Assert.assertEquals(1, content.length);
+            String[] row1 = content[0];
+            Assert.assertEquals(2, row1.length);
+            Assert.assertEquals("A", row1[0]);
+            Assert.assertEquals("Test", row1[1]);
+            writtenBook.close();
+        }
+    }
+    
+    /**
+     * 
+     * @throws IOException if an error occurs while reading the data (Must not occur during testing)
+     * @throws FormatException if the contents of the file cannot be parsed (Must not occur during testing)
+     * @throws IllegalStateException If the workbook given is password protected (Must not occur during testing)
+     */
+    @Test
+    public void testWriteMultipleSheets() throws IllegalStateException, IOException, FormatException {
+        File newWorkbook = new File(TMPFOLDER, "testWriteMultipleSheets.xlsx");
+        Assert.assertFalse(newWorkbook.exists());
+        String sheetName1 = "newSheet1";
+        String sheetName2 = "newSheet2";
+        
+        // Create empty book
+        ExcelBook book = new ExcelBook(newWorkbook);
+        Assert.assertEquals(0, book.getTableNames().size());
+        
+        // Create first sheet
+        ExcelSheetWriter writer = book.getWriter(sheetName1);
+        Assert.assertEquals(1, book.getTableNames().size());
+        Assert.assertTrue(book.getTableNames().contains(sheetName1));
+        Assert.assertFalse(book.getTableNames().contains(sheetName2));
+        writer.writeRow("A", "Test");
+        
+        // Create first sheet
+        writer = book.getWriter(sheetName2);
+        Assert.assertEquals(2, book.getTableNames().size());
+        Assert.assertTrue(book.getTableNames().contains(sheetName1));
+        Assert.assertTrue(book.getTableNames().contains(sheetName2));
+        writer.writeRow("Another", "Test");
+        writer.writeRow("With", "2 Rows");
+        
+        // Write contents to file system
+        book.close();
+        
+        // Test that correct content was written
+        try (ExcelBook writtenBook = new ExcelBook(newWorkbook)) {
+            ExcelSheetReader reader = writtenBook.getReader(sheetName1);
+            String[][] content = reader.readFull();
+            Assert.assertEquals(1, content.length);
+            String[] row1 = content[0];
+            Assert.assertEquals(2, row1.length);
+            Assert.assertEquals("A", row1[0]);
+            Assert.assertEquals("Test", row1[1]);
+            
+            reader = writtenBook.getReader(sheetName2);
+            content = reader.readFull();
+            Assert.assertEquals(2, content.length);
+            row1 = content[0];
+            Assert.assertEquals(2, row1.length);
+            Assert.assertEquals("Another", row1[0]);
+            Assert.assertEquals("Test", row1[1]);
+            String[] row2 = content[1];
+            Assert.assertEquals(2, row2.length);
+            Assert.assertEquals("With", row2[0]);
+            Assert.assertEquals("2 Rows", row2[1]);
+
+            writtenBook.close();
         }
     }
 
