@@ -12,6 +12,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.util.WorkbookUtil;
 
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.io.ITableCollection;
@@ -123,7 +124,28 @@ public class ExcelBook implements ITableCollection, Closeable {
 
     @Override
     public ITableWriter getWriter(String name) throws IOException {
-        throw new UnsupportedOperationException("Writing excel sheets is not yet supported");
+        String safeName = WorkbookUtil.createSafeSheetName(name);
+        IllegalArgumentException exception = null;
+        Sheet sheet = null;
+        try {
+            sheet = wb.createSheet(safeName);
+        } catch (IllegalArgumentException exc) {
+            exception = exc;
+            byte id = 0;
+            while (null == sheet && id < Byte.MAX_VALUE) {
+                String tmpName = WorkbookUtil.createSafeSheetName(safeName + id);
+                try {
+                    sheet = wb.createSheet(tmpName);
+                } catch (IllegalArgumentException exc2) {
+                    // No action needed
+                }
+                id++;
+            }
+        }
+        if (null == sheet) {
+            throw new IOException("Could not create sheet \"" + safeName + "\", cause: " + exception.getMessage());
+        }
+        return new ExcelSheetWriter(sheet);
     }
     
     @Override
