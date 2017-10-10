@@ -43,7 +43,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
          * However, flushing current data is possible
          */
         if (null != wb) {
-            wb.flush();
+            wb.flush(this);
         }
     }
 

@@ -17,7 +17,6 @@ import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import net.ssehub.kernel_haven.util.FormatException;
-import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.io.ITableCollection;
 
 /**
@@ -44,6 +43,8 @@ public class ExcelBook implements ITableCollection {
     private boolean ignoreEmptyRows;
     private Mode mode;
     private File destinationFile;
+    
+    private Set<ExcelSheetWriter> openWriters;
     
     /**
      * Default constructor for reading and writing a Excel documents (XLSX, XLS).
@@ -75,6 +76,7 @@ public class ExcelBook implements ITableCollection {
         
         this.ignoreEmptyRows = ignoreEmptyRows;
         this.destinationFile = destinationFile;
+        openWriters = new HashSet<>();
         if (!destinationFile.exists()) {
             if (destinationFile.createNewFile()) {
                 mode = Mode.WRITE_NEW_WB;
@@ -186,7 +188,10 @@ public class ExcelBook implements ITableCollection {
                  */
                 wb.setSheetOrder(sheet.getSheetName(), 0);
             }
-            return new ExcelSheetWriter(this, sheet);
+            
+            ExcelSheetWriter writer = new ExcelSheetWriter(this, sheet);
+            openWriters.add(writer);
+            return writer;
         }
     }
     
@@ -205,13 +210,14 @@ public class ExcelBook implements ITableCollection {
     
     /**
      * Allows {@link ExcelSheetWriter}s to write there content (one sheet).
+     * @param writer The writer which is closed and calls this method.
+     * @throws IOException if the file exists but is a directory rather than a regular file, does not exist but cannot
+     *     be created, or cannot be opened for any other reason, or if anything could not be written
+     * @throws IllegalStateException If a future version of this class does not consider all possible states
      */
-    synchronized void flush() {
-        try {
-            write();
-        } catch (IllegalStateException | IOException e) {
-            Logger.get().logWarning(e.getMessage());
-        }
+    synchronized void flush(ExcelSheetWriter writer) throws IOException, IllegalStateException {
+        openWriters.remove(writer);
+        write();
     }
 
     /**
