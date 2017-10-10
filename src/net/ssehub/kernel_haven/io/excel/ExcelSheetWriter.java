@@ -49,9 +49,10 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     
     /**
      * Splits text values, which are too long into separate fields to avoid {@link IllegalArgumentException}s.
-     * Tries to splitt values at white space characters.
+     * Tries to split values at white space characters.
      * @param fields The field values of a row to store.
      * @return The values to write, should be the same values unless there were some values to long.
+     * <a href="https://stackoverflow.com/a/31937583">https://stackoverflow.com/a/31937583</a>
      */
     private List<String> prepareFields(String... fields) {
         List<String> result = null;
