@@ -171,14 +171,16 @@ public class ExcelBookTest {
         Assert.assertTrue(book.getTableNames().contains(sheetName1));
         Assert.assertFalse(book.getTableNames().contains(sheetName2));
         writer.writeRow("A", "Test");
+        writer.close();
         
-        // Create first sheet
+        // Create second sheet
         writer = book.getWriter(sheetName2);
         Assert.assertEquals(2, book.getTableNames().size());
         Assert.assertTrue(book.getTableNames().contains(sheetName1));
         Assert.assertTrue(book.getTableNames().contains(sheetName2));
         writer.writeRow("Another", "Test");
         writer.writeRow("With", "2 Rows");
+        writer.close();
         
         // Write contents to file system
         book.close();

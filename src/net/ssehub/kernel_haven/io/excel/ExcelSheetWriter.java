@@ -24,15 +24,27 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     
     private Sheet sheet;
     private int currentRow;
+    private ExcelBook wb;
     
     ExcelSheetWriter(Sheet sheet) {
         this.sheet = sheet;
         currentRow = sheet.getPhysicalNumberOfRows();
     }
+    
+    ExcelSheetWriter(ExcelBook wb, Sheet sheet) {
+        this(sheet);
+        this.wb = wb;
+    }
 
     @Override
     public void close() throws IOException {
-        // Not needed, closing operation is handled in Workbook.
+        /*
+         * In principle no needed, closing operation is handled in Workbook.
+         * However, flushing temp data is possible
+         */
+        if (null != wb) {
+            wb.flush();
+        }
     }
 
     @Override

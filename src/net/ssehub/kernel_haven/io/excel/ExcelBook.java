@@ -17,6 +17,7 @@ import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import net.ssehub.kernel_haven.util.FormatException;
+import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.io.ITableCollection;
 
 /**
@@ -185,22 +186,13 @@ public class ExcelBook implements ITableCollection {
                  */
                 wb.setSheetOrder(sheet.getSheetName(), 0);
             }
-            return new ExcelSheetWriter(sheet);
+            return new ExcelSheetWriter(this, sheet);
         }
     }
     
     @Override
     public void close() throws IOException {
-        switch (mode) {
-        case WRITE_NEW_WB:
-            wb.setActiveSheet(0);
-            BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(destinationFile));
-            wb.write(fileOut);
-        case READ_ONLY:
-            break;
-        default:
-            throw new IllegalStateException("Unexpected close opperation for state: " + mode.name());
-        }
+        write();
         wb.close();
     }
 
@@ -210,5 +202,35 @@ public class ExcelBook implements ITableCollection {
         result.add(destinationFile);
         return result;
     }
+    
+    /**
+     * Allows {@link ExcelSheetWriter}s to write there content (one sheet).
+     */
+    void flush() {
+        try {
+            write();
+        } catch (IllegalStateException | IOException e) {
+            Logger.get().logWarning(e.getMessage());
+        }
+    }
 
+    /**
+     * Writes the passed values as long as the document was not opened in read only mode.
+     * @throws IOException if the file exists but is a directory rather than a regular file, does not exist but cannot
+     *     be created, or cannot be opened for any other reason, or if anything could not be written
+     * @throws IllegalStateException If a future version of this class does not consider all possible states
+     */
+    private void write() throws IOException, IllegalStateException {
+        switch (mode) {
+        case WRITE_NEW_WB:
+            wb.setActiveSheet(0);
+            BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(destinationFile));
+            wb.write(fileOut);
+        case READ_ONLY:
+            break;
+        default:
+            // Should not happen, this is only to ensure that future versions consider all states.
+            throw new IllegalStateException("Unexpected close opperation for state: " + mode.name());
+        }
+    }
 }
