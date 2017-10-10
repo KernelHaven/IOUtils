@@ -72,6 +72,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
                     
                     firstPart = fieldValue.substring(0, pos);
                     result.add(firstPart);
+                    pos = Math.min(pos + 1, fieldValue.length() - 1);
                     fieldValue = fieldValue.substring(pos);
                 }
                 result.add(fieldValue);

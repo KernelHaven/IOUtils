@@ -193,6 +193,7 @@ public class ExcelBook implements ITableCollection {
     public void close() throws IOException {
         switch (mode) {
         case WRITE_NEW_WB:
+            wb.setActiveSheet(0);
             BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(destinationFile));
             wb.write(fileOut);
         case READ_ONLY:
