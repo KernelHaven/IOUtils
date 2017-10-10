@@ -40,7 +40,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     public void close() throws IOException {
         /*
          * In principle no needed, closing operation is handled in Workbook.
-         * However, flushing temp data is possible
+         * However, flushing current data is possible
          */
         if (null != wb) {
             wb.flush();
@@ -49,12 +49,15 @@ public class ExcelSheetWriter extends AbstractTableWriter {
 
     @Override
     public void writeRow(String... fields) throws IOException {
-        List<String> cellValues = prepareFields(fields);
-        if (null != cellValues) {
-            Row row = sheet.createRow(currentRow++);
-            for (int i = 0; i < cellValues.size(); i++) {
-                Cell cell = row.createCell(i);
-                cell.setCellValue(cellValues.get(i));
+        // make sure we don't modify the content while the workbook is writing to disk
+        synchronized (wb) {
+            List<String> cellValues = prepareFields(fields);
+            if (null != cellValues) {
+                Row row = sheet.createRow(currentRow++);
+                for (int i = 0; i < cellValues.size(); i++) {
+                    Cell cell = row.createCell(i);
+                    cell.setCellValue(cellValues.get(i));
+                }
             }
         }
     }

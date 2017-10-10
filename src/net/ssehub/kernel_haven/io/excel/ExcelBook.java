@@ -101,7 +101,7 @@ public class ExcelBook implements ITableCollection {
      * 
      * @return Readers for all sheets of the Excel document.
      */
-    public List<ExcelSheetReader> getAllSheetReaders() {
+    public synchronized List<ExcelSheetReader> getAllSheetReaders() {
         List<ExcelSheetReader> result = new ArrayList<>();
         
         for (Sheet sheet : wb) {
@@ -120,14 +120,14 @@ public class ExcelBook implements ITableCollection {
      * @throws IllegalArgumentException if the index is out of range (index
      *            &lt; 0 || index &gt;= getNumberOfSheets()).
      */
-    public ExcelSheetReader getReader(int index) {
+    public synchronized ExcelSheetReader getReader(int index) {
         Sheet sheet = wb.getSheetAt(index);
         
         return new ExcelSheetReader(sheet, ignoreEmptyRows);
     }
     
     @Override
-    public Set<String> getTableNames() throws IOException {
+    public synchronized Set<String> getTableNames() throws IOException {
         Set<String> result = new HashSet<>();
         
         for (Sheet sheet : wb) {
@@ -138,7 +138,7 @@ public class ExcelBook implements ITableCollection {
     }
     
     @Override
-    public ExcelSheetReader getReader(String name) {
+    public synchronized ExcelSheetReader getReader(String name) {
         ExcelSheetReader result = null;
         for (Sheet sheet : wb) {
             if (sheet.getSheetName().equals(name)) {
@@ -150,7 +150,7 @@ public class ExcelBook implements ITableCollection {
     }
 
     @Override
-    public ExcelSheetWriter getWriter(String name) throws IOException {
+    public synchronized ExcelSheetWriter getWriter(String name) throws IOException {
         switch (mode) {
         case READ_ONLY:
             throw new UnsupportedOperationException("Sheet was oppened in read only mode: "
@@ -191,7 +191,7 @@ public class ExcelBook implements ITableCollection {
     }
     
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         write();
         wb.close();
     }
@@ -206,7 +206,7 @@ public class ExcelBook implements ITableCollection {
     /**
      * Allows {@link ExcelSheetWriter}s to write there content (one sheet).
      */
-    void flush() {
+    synchronized void flush() {
         try {
             write();
         } catch (IllegalStateException | IOException e) {
@@ -220,7 +220,7 @@ public class ExcelBook implements ITableCollection {
      *     be created, or cannot be opened for any other reason, or if anything could not be written
      * @throws IllegalStateException If a future version of this class does not consider all possible states
      */
-    private void write() throws IOException, IllegalStateException {
+    private synchronized void write() throws IOException, IllegalStateException {
         switch (mode) {
         case WRITE_NEW_WB:
             wb.setActiveSheet(0);
