@@ -232,6 +232,7 @@ public class ExcelBook implements ITableCollection {
             wb.setActiveSheet(0);
             BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(destinationFile));
             wb.write(fileOut);
+            // falls through
         case READ_ONLY:
             break;
         default:
