@@ -83,7 +83,7 @@ public class ExcelSheetReader implements ITableReader {
                 
                 // Handle missing/undefined cells
                 while (currentCell.getColumnIndex() > rowContents.size()) {
-                    rowContents.add(null);
+                    rowContents.add("");
                 }
                 
                 String value = null;
@@ -112,7 +112,7 @@ public class ExcelSheetReader implements ITableReader {
             if (!ignoreEmptyRows || !isEmpty) {
                 // Handle missing/undefined cells at the end of row
                 while (rowContents.size() < nColumns) {
-                    rowContents.add(null);
+                    rowContents.add("");
                 }
                 this.contents.add(rowContents.toArray(new String[0]));
             }

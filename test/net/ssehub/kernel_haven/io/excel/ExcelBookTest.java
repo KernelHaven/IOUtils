@@ -122,7 +122,7 @@ public class ExcelBookTest {
         Assert.assertEquals("Expected 3 entries in 1st row", 3, allRows[0].length);
         Assert.assertEquals("Expected 3 entries in 2nd row", 3, allRows[1].length);
         Assert.assertEquals("Value 1", allRows[1][0]);
-        Assert.assertNull(allRows[1][1]);
+        Assert.assertEquals("", allRows[1][1]);
         Assert.assertEquals("Value 3", allRows[1][2]);
     }
     
@@ -138,7 +138,7 @@ public class ExcelBookTest {
         Assert.assertEquals("Expected 3 entries in 2nd row", 3, allRows[1].length);
         Assert.assertEquals("Value 1", allRows[1][0]);
         Assert.assertEquals("Value 2", allRows[1][1]);
-        Assert.assertNull(allRows[1][2]);
+        Assert.assertEquals("", allRows[1][2]);
     }
     
     
