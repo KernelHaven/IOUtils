@@ -36,11 +36,12 @@ public class TableCollectionUtils {
      */
     public static ITableCollection openExcelOrCsvCollection(File file) throws IOException {
         ITableCollection result;
+        String fileName = file.getName();
         
-        if (file.getName().endsWith(".csv")) {
+        if (fileName.endsWith(".csv")) {
             result = new CsvFileSet(file);
             
-        } else if (file.getName().endsWith(".xlsx")) {
+        } else if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls") ) {
             try {
                 result = new ExcelBook(file);
             } catch (FormatException e) {
