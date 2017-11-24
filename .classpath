@@ -9,7 +9,7 @@
 	<classpathentry kind="lib" path="lib/include/xmlbeans-2.6.0.jar"/>
 	<classpathentry kind="lib" path="lib/include/commons-collections4-4.1.jar"/>
 	<classpathentry kind="lib" path="lib/include/poi-3.17.jar" sourcepath="lib/poi-src-3.17-20170915.zip"/>
-	<classpathentry kind="lib" path="lib/include/poi-ooxml-3.17.jar"/>
+	<classpathentry kind="lib" path="lib/include/poi-ooxml-3.17.jar" sourcepath="C:/Repos/GIT/KernelHaven/IOUtils/lib/poi-src-3.17-20170915.zip"/>
 	<classpathentry kind="lib" path="lib/include/poi-ooxml-schemas-3.17.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/KernelHaven"/>
