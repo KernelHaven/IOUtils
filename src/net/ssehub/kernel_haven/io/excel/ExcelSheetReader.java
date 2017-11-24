@@ -51,6 +51,8 @@ public class ExcelSheetReader implements ITableReader {
     }
     
     private void read() {
+        // Retrieves only the number of entries in first column (unsure if this is detailed enough)
+        final int nColumns = sheet.getRow(0).getLastCellNum();
         Iterator<Row> rowIterator = sheet.rowIterator();
         Deque<Integer> groupedRows = new ArrayDeque<>();
         int groupLevel = 0;
@@ -74,28 +76,26 @@ public class ExcelSheetReader implements ITableReader {
                 }
             }
             
-//            if (currentGroupLevel > groupLevel) {
-//            } else if (currentGroupLevel < groupLevel) {
-//                // Current row does not belong to the current row anymore, save last grouping
-//                Integer groupingStart = groupedRows.pollFirst();
-//                result.addRowGrouping(groupingStart, previousRow);
-//            }
-//            groupLevel = currentGroupLevel;
-            
             Iterator<Cell> cellIterator = currentRow.iterator();
             boolean isEmpty = true;
             while (cellIterator.hasNext()) {
                 Cell currentCell = cellIterator.next();
+                
+                // Handle missing/undefined cells
+                while (currentCell.getColumnIndex() > rowContents.size()) {
+                    rowContents.add(null);
+                }
+                
                 String value = null;
                 switch (currentCell.getCellTypeEnum()) {
                 case STRING:
                     value = currentCell.getStringCellValue();
                     break;
                 case NUMERIC:
-                    value = currentCell.getNumericCellValue() + "";
+                    value = Double.toString(currentCell.getNumericCellValue());
                     break;
                 case BOOLEAN:
-                    value = currentCell.getBooleanCellValue() + "";
+                    value = Boolean.toString(currentCell.getBooleanCellValue());
                     break;
                 case FORMULA:
                     value = currentCell.getStringCellValue();
@@ -110,6 +110,10 @@ public class ExcelSheetReader implements ITableReader {
             }
             
             if (!ignoreEmptyRows || !isEmpty) {
+                // Handle missing/undefined cells at the end of row
+                while (rowContents.size() < nColumns) {
+                    rowContents.add(null);
+                }
                 this.contents.add(rowContents.toArray(new String[0]));
             }
             previousRow++;

@@ -111,6 +111,62 @@ public class ExcelBookTest {
     }
     
     /**
+     * Tests the correct retrieval of cell values, even if intermediate cells are undefined.
+     * 
+     */
+    @Test
+    public void testHandleUndefinedCells()  {
+        String[][] allRows = loadSheet("UndefinedIntermediateCell.xlsx", "UndefinedCell");
+        
+        Assert.assertEquals("Expected 2 rows", 2, allRows.length);
+        Assert.assertEquals("Expected 3 entries in 1st row", 3, allRows[0].length);
+        Assert.assertEquals("Expected 3 entries in 2nd row", 3, allRows[1].length);
+        Assert.assertEquals("Value 1", allRows[1][0]);
+        Assert.assertNull(allRows[1][1]);
+        Assert.assertEquals("Value 3", allRows[1][2]);
+    }
+    
+    /**
+     * Tests the correct retrieval of cell values, even if cells at the end of the row are undefined.
+     */
+    @Test
+    public void testHandleUndefinedCellsAtEndOfRow()  {
+        String[][] allRows = loadSheet("UndefinedLastCell.xlsx", "UndefinedCell");
+        
+        Assert.assertEquals("Expected 2 rows", 2, allRows.length);
+        Assert.assertEquals("Expected 3 entries in 1st row", 3, allRows[0].length);
+        Assert.assertEquals("Expected 3 entries in 2nd row", 3, allRows[1].length);
+        Assert.assertEquals("Value 1", allRows[1][0]);
+        Assert.assertEquals("Value 2", allRows[1][1]);
+        Assert.assertNull(allRows[1][2]);
+    }
+    
+    
+    /**
+     * Loads the specified sheet content from the specified workbook.
+     * @param fileName The workbook to load, a path relative to {@link AllTests#TESTDATA}.
+     * @param sheetName The name of the sheet to load.
+     * @return Will return the content of the sheet (if it cannot be loaded, the test will fail already at this part).
+     */
+    private String[][] loadSheet(String fileName, String sheetName) {
+        ExcelSheetReader reader = null;
+        File inputFile = new File(AllTests.TESTDATA, fileName);
+        String[][] content = null;
+        try (ExcelBook book = new ExcelBook(inputFile, true)) {
+            assertThat(book.getTableNames(), hasItem(sheetName));
+            reader = book.getReader(sheetName);
+            Assert.assertNotNull(reader);
+            
+            content = reader.readFull();
+        } catch (IllegalStateException | IOException | FormatException e) {
+            Assert.fail(e.getMessage());
+        }
+        
+        Assert.assertNotNull(content);
+        return content;
+    }
+    
+    /**
      * 
      * @throws IOException if an error occurs while reading the data (Must not occur during testing)
      * @throws FormatException if the contents of the file cannot be parsed (Must not occur during testing)
