@@ -244,18 +244,19 @@ public class ExcelBook implements ITableCollection {
     }
     
     /**
-     * Will wait for open writers 10 seconds until it will close all writers.
+     * Will wait for open writers 5 seconds until it will close all writers.
      * Will also suppress but log all exceptions to avoid crashing of whole Workbook.
      */
     private void closingLoop() {
         // Wait for open writers, maybe they still receive data.
         int attemptNo = 0;
-        while (!openWriters.isEmpty() && attemptNo < 10) {
+        while (!openWriters.isEmpty() && attemptNo < 5) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 Logger.get().logWarning("Error while ExcelBook is waiting for its sheets: " + e.getMessage());
             }
+            attemptNo++;
         }
         
         // Close open writers
