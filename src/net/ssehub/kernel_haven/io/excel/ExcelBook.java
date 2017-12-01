@@ -17,6 +17,7 @@ import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import net.ssehub.kernel_haven.util.FormatException;
+import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.io.ITableCollection;
 
 /**
@@ -197,6 +198,7 @@ public class ExcelBook implements ITableCollection {
     
     @Override
     public synchronized void close() throws IOException {
+        closingLoop();
         write();
         wb.close();
     }
@@ -238,6 +240,31 @@ public class ExcelBook implements ITableCollection {
         default:
             // Should not happen, this is only to ensure that future versions consider all states.
             throw new IllegalStateException("Unexpected close opperation for state: " + mode.name());
+        }
+    }
+    
+    /**
+     * Will wait for open writers 10 seconds until it will close all writers.
+     * Will also suppress but log all exceptions to avoid crashing of whole Workbook.
+     */
+    private void closingLoop() {
+        // Wait for open writers, maybe they still receive data.
+        int attemptNo = 0;
+        while (!openWriters.isEmpty() && attemptNo < 10) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Logger.get().logWarning("Error while ExcelBook is waiting for its sheets: " + e.getMessage());
+            }
+        }
+        
+        // Close open writers
+        for (ExcelSheetWriter excelSheetWriter : openWriters) {
+            try {
+                flush(excelSheetWriter);
+            } catch (IOException e) {
+                Logger.get().logError("Error while writing sheet: " + e.getMessage());
+            }
         }
     }
 }
