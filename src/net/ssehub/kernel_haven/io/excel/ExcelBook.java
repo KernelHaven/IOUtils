@@ -260,7 +260,8 @@ public class ExcelBook implements ITableCollection {
         }
         
         // Close open writers
-        for (ExcelSheetWriter excelSheetWriter : openWriters) {
+        List<ExcelSheetWriter> tmp = new ArrayList<>(openWriters);
+        for (ExcelSheetWriter excelSheetWriter : tmp) {
             try {
                 flush(excelSheetWriter);
             } catch (IOException e) {
