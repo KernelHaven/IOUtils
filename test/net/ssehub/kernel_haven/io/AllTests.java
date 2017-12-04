@@ -15,7 +15,9 @@ import net.ssehub.kernel_haven.io.excel.AllExcelTests;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    AllExcelTests.class
+    AllExcelTests.class,
+    
+    TableCollectionUtilsTest.class,
 })
 public class AllTests {
     
