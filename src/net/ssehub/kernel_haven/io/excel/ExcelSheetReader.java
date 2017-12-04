@@ -101,7 +101,7 @@ public class ExcelSheetReader implements ITableReader {
                     value = Boolean.toString(currentCell.getBooleanCellValue());
                     break;
                 case FORMULA:
-                    value = currentCell.getStringCellValue();
+                    value = currentCell.getCellFormula();
                     break;
                 default: 
                     value = currentCell.getStringCellValue();

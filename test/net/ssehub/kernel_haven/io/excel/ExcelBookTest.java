@@ -484,4 +484,29 @@ public class ExcelBookTest {
         }
     }
     
+    /**
+     * Tests that the {@link ExcelSheetReader} can handled different content types.
+     * 
+     * @throws IOException unwanted.
+     * @throws IllegalStateException unwanted.
+     * @throws FormatException unwanted.
+     */
+    @Test
+    public void testReadDifferentContentTypes() throws IOException, IllegalStateException, FormatException {
+        try (ExcelBook book = new ExcelBook(new File("testdata/DifferentContentTypes.xlsx"))) {
+            ExcelSheetReader reader = book.getReader(0);
+            
+            assertThat(reader.readFull(), is(new String[][] {
+                { "String", "Text" },
+                { "Numeric", "1.0" },
+                { "Boolean", "true" },
+                { "Formula", "3+2" },
+                { "Blank", "" },
+                { "Error", "4/0" },
+            }));
+            
+            reader.close();
+        }
+    }
+    
 }
