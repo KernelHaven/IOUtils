@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -278,6 +279,29 @@ public class ExcelBookTest {
     @Test
     public void testOpenAndCloseNonExistingBook() throws IOException, IllegalStateException, FormatException {
         new ExcelBook(new File("testdata/DoesntExist.xlsx")).close();
+    }
+    
+    /**
+     * Tests the {@link ExcelBook#getFiles()} method.
+     * 
+     * @throws IOException unwanted.
+     * @throws IllegalStateException unwanted.
+     * @throws FormatException unwanted.
+     */
+    @Test
+    public void testGetFiles() throws IOException, IllegalStateException, FormatException {
+        try (ExcelBook book = new ExcelBook(new File("test.xls"))) {
+            HashSet<File> expected = new HashSet<>();
+            expected.add(new File("test.xls"));
+            assertThat(book.getFiles(), is(expected));
+        }
+    }
+    
+    @Test(expected = UnsupportedOperationException.class)
+    public void testWriteToExisting() throws IOException, IllegalStateException, FormatException {
+        try (ExcelBook book = new ExcelBook(new File("testdata/Existing.xlsx"))) {
+            book.getWriter("test").close();
+        }
     }
 
     /**
