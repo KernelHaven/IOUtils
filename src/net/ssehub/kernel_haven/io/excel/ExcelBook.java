@@ -231,9 +231,15 @@ public class ExcelBook implements ITableCollection {
     private synchronized void write() throws IOException, IllegalStateException {
         switch (mode) {
         case WRITE_NEW_WB:
-            wb.setActiveSheet(0);
-            BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(destinationFile));
-            wb.write(fileOut);
+            // check that there are sheets; if not, then no data was written and we do not create this book
+            if (wb.getNumberOfSheets() > 0) {
+                wb.setActiveSheet(0);
+                BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(destinationFile));
+                wb.write(fileOut);
+            } else {
+                // opening the workbook created an empty file; delete it, since we have no data to write
+                destinationFile.delete();
+            }
             // falls through
         case READ_ONLY:
             break;

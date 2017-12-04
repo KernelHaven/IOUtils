@@ -266,6 +266,19 @@ public class ExcelBookTest {
             writtenBook.close();
         }
     }
+    
+    /**
+     * Opens and then closes an empty excel book. This test was created for an out-of-range bug when closing an empty
+     * book.
+     * 
+     * @throws IOException unwanted.
+     * @throws FormatException unwanted.
+     * @throws IllegalStateException unwanted.
+     */
+    @Test
+    public void testOpenAndCloseNonExistingBook() throws IOException, IllegalStateException, FormatException {
+        new ExcelBook(new File("testdata/DoesntExist.xlsx")).close();
+    }
 
     /**
      * Asserts the correct setting of the tested group.
