@@ -68,6 +68,17 @@ public class ExcelBookTest {
     }
     
     /**
+     * Asserts the correct setting of the tested group.
+     * @param group The group to test.
+     * @param startIndex The expected first row of the group (starts a 0).
+     * @param endIndex The expected last row of the group (starts a 0).
+     */
+    private void assertGroup(Group group, int startIndex, int endIndex) {
+        Assert.assertEquals("Start index for Group " + group + " not as expected.", startIndex, group.getStartIndex());
+        Assert.assertEquals("End index for Group " + group + " not as expected.", endIndex, group.getEndIndex());
+    }
+    
+    /**
      * Tests the groups point to existing rows and won't cause {@link IndexOutOfBoundsException}s.
      * @throws IllegalStateException Should not occur, otherwise the tested Excel file is password protected.
      * @throws IOException Should not occur, otherwise the tested Excel document cannot be opened.
@@ -352,16 +363,18 @@ public class ExcelBookTest {
             }
         }
     }
-
+    
     /**
-     * Asserts the correct setting of the tested group.
-     * @param group The group to test.
-     * @param startIndex The expected first row of the group (starts a 0).
-     * @param endIndex The expected last row of the group (starts a 0).
+     * Tests that reading an invalid file correctly throws an exception.
+     * 
+     * @throws IOException wanted.
+     * @throws IllegalStateException unwanted.
+     * @throws FormatException unwanted.
      */
-    private void assertGroup(Group group, int startIndex, int endIndex) {
-        Assert.assertEquals("Start index for Group " + group + " not as expected.", startIndex, group.getStartIndex());
-        Assert.assertEquals("End index for Group " + group + " not as expected.", endIndex, group.getEndIndex());
+    @Test(expected = IOException.class)
+    public void testReadCorrupted() throws IOException, IllegalStateException, FormatException {
+        ExcelBook book = new ExcelBook(new File("testdata/Corrupted.xls"));
+        book.close();
     }
     
 }
