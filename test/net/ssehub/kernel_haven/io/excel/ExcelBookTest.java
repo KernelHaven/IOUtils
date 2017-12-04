@@ -2,6 +2,7 @@ package net.ssehub.kernel_haven.io.excel;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
@@ -10,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -506,6 +508,42 @@ public class ExcelBookTest {
             }));
             
             reader.close();
+        }
+    }
+    
+    /**
+     * Tests that writing really long field names is handled correctly.
+     * 
+     * @throws IOException unwanted.
+     * @throws IllegalStateException unwanted.
+     * @throws FormatException unwanted.
+     */
+    @Test
+    public void testWriteLongField() throws IOException, IllegalStateException, FormatException {
+        File dst = new File("testdata/tmp.xls");
+        final int LENGTH = SpreadsheetVersion.EXCEL2007.getMaxTextLength() + 200;
+        
+        try (ExcelBook book = new ExcelBook(dst)) {
+            
+            StringBuilder str = new StringBuilder();
+            for (int i = 0; i < LENGTH; i++) {
+                str.append('a');
+            }
+            
+            ExcelSheetWriter writer = book.getWriter("Sheet");
+            writer.writeRow(str.toString());
+            writer.close();
+            
+            ExcelSheetReader reader = book.getReader("Sheet");
+            String[] row = reader.readNextRow();
+            assertThat(row.length, is(2));
+            assertThat(row[0].length(), is(SpreadsheetVersion.EXCEL2007.getMaxTextLength()));
+            assertThat(row[1].length(), is(200));
+
+            assertThat(reader.readNextRow(), nullValue());
+            
+        } finally {
+            dst.delete();
         }
     }
     
