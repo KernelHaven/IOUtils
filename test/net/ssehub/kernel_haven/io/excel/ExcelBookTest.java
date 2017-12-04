@@ -377,4 +377,32 @@ public class ExcelBookTest {
         book.close();
     }
     
+    /**
+     * Tests that trying to create the same sheet (same name) twice is handled correctly.
+     * 
+     * @throws IOException unwanted.
+     * @throws IllegalStateException unwanted.
+     * @throws FormatException unwanted.
+     */
+    @Test
+    public void testCreateSameSheetTwice() throws IOException, IllegalStateException, FormatException {
+        File dst = new File("testdata/tmp.xls");
+        try (ExcelBook book = new ExcelBook(dst)) {
+            
+            ExcelSheetWriter writer = book.getWriter("Sheet");
+            writer.writeRow("Test", "Data");
+            writer.close();
+            
+            writer = book.getWriter("Sheet");
+            writer.writeRow("Other", "Test", "Data");
+            writer.close();
+
+            ExcelSheetReader reader = book.getReader("Sheet");
+            assertThat(reader.readFull(), is(new String[][] { { "Other", "Test", "Data" } }));
+            
+        } finally {
+            dst.delete();
+        }
+    }
+    
 }

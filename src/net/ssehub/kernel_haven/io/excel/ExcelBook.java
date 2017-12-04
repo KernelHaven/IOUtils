@@ -168,15 +168,21 @@ public class ExcelBook implements ITableCollection {
                 sheet = wb.createSheet(safeName);
             } catch (IllegalArgumentException exc) {
                 exception = exc;
-                byte id = 0;
-                while (null == sheet && id < Byte.MAX_VALUE) {
-                    String tmpName = WorkbookUtil.createSafeSheetName(safeName + id);
+                
+                // either the sheet name is invalid, or a sheet with the same name exists already
+                
+                // check whether a sheet with the same name exists
+                Sheet existing = wb.getSheet(safeName);
+                if (existing != null) {
+                    // if a sheet with the same name exists already, overwrite it (as specified in JavaDoc)
+                    wb.removeSheetAt(wb.getSheetIndex(existing));
+                    
+                    // now try to create the sheet again
                     try {
-                        sheet = wb.createSheet(tmpName);
+                        sheet = wb.createSheet(safeName);
                     } catch (IllegalArgumentException exc2) {
-                        // No action needed
+                        exception = exc2;
                     }
-                    id++;
                 }
             }
             if (null == sheet) {
