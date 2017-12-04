@@ -297,10 +297,43 @@ public class ExcelBookTest {
         }
     }
     
+    /**
+     * Tests that writing to an existing (and thus read-only) book throws an exception.
+     * 
+     * @throws IOException unwanted.
+     * @throws IllegalStateException unwanted.
+     * @throws FormatException unwanted.
+     */
     @Test(expected = UnsupportedOperationException.class)
     public void testWriteToExisting() throws IOException, IllegalStateException, FormatException {
         try (ExcelBook book = new ExcelBook(new File("testdata/Existing.xlsx"))) {
             book.getWriter("test").close();
+        }
+    }
+    
+    /**
+     * Tests that the getAllSheetReaders() method correctly returns all sheet readers.
+     * 
+     * @throws IOException unwanted.
+     * @throws IllegalStateException unwanted.
+     * @throws FormatException unwanted.
+     */
+    @Test
+    public void testGetAllSheetReaders() throws IOException, IllegalStateException, FormatException {
+        try (ExcelBook book = new ExcelBook(new File("testdata/MultipleSheets.xlsx"))) {
+            List<ExcelSheetReader> readers = book.getAllSheetReaders();
+            
+            assertThat(readers.get(0).getSheetName(), is("Sheet1"));
+            assertThat(readers.get(1).getSheetName(), is("Sheet2"));
+            assertThat(readers.get(2).getSheetName(), is("Sheet3"));
+            
+            assertThat(readers.get(0).readFull(), is(new String[][] { { "Sheet", "One" } }));
+            assertThat(readers.get(1).readFull(), is(new String[][] { { "Sheet", "Two" } }));
+            assertThat(readers.get(2).readFull(), is(new String[][] { { "Sheet", "Three" } }));
+            
+            for (ExcelSheetReader reader : readers) {
+                reader.close();
+            }
         }
     }
 
