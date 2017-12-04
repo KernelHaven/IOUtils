@@ -52,7 +52,10 @@ public class ExcelSheetReader implements ITableReader {
     
     private void read() {
         // Retrieves only the number of entries in first column (unsure if this is detailed enough)
-        final int nColumns = sheet.getRow(0).getLastCellNum();
+        int nColumns = 0;
+        if (sheet.getRow(0) != null) {
+            nColumns = sheet.getRow(0).getLastCellNum();
+        }
         Iterator<Row> rowIterator = sheet.rowIterator();
         Deque<Integer> groupedRows = new ArrayDeque<>();
         int groupLevel = 0;

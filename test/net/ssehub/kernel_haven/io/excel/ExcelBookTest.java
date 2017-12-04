@@ -336,6 +336,22 @@ public class ExcelBookTest {
             }
         }
     }
+    
+    /**
+     * Tests that reading an empty sheet works correctly. 
+     * 
+     * @throws IOException unwanted.
+     * @throws IllegalStateException unwanted.
+     * @throws FormatException unwanted.
+     */
+    @Test
+    public void testReadEmptySheet() throws IOException, IllegalStateException, FormatException {
+        try (ExcelBook book = new ExcelBook(new File("testdata/EmptySheet.xlsx"))) {
+            try (ExcelSheetReader reader = book.getReader(0)) {
+                assertThat(reader.readFull(), is(new String[0][]));
+            }
+        }
+    }
 
     /**
      * Asserts the correct setting of the tested group.
