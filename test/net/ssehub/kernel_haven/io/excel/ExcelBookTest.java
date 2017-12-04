@@ -68,6 +68,85 @@ public class ExcelBookTest {
     }
     
     /**
+     * Tests the correct retrieval of groups for specified rows.
+     * 
+     * @throws IllegalStateException Should not occur, otherwise the tested Excel file is password protected.
+     * @throws IOException Should not occur, otherwise the tested Excel document cannot be opened.
+     * @throws FormatException Should not occur, otherwise the tested Excel cannot be parsed
+     */
+    @Test
+    public void testGetRowGroups() throws IllegalStateException, IOException, FormatException {
+        File inputFile = new File(AllTests.TESTDATA, "GroupedValues.xlsx");
+        
+        try (ExcelBook book = new ExcelBook(inputFile, true)) {
+            assertThat(book.getTableNames(), hasItem("Test Sheet"));
+            
+            ExcelSheetReader reader = book.getReader("Test Sheet");
+            
+            String[][] allRows = reader.readFull();
+            assertThat(allRows.length, is(6));
+            
+            List<Group> groups = reader.getRowGroups(0);
+            assertThat(groups.size(), is(0));
+            
+            groups = reader.getRowGroups(1);
+            assertThat(groups.size(), is(1));
+            assertGroup(groups.get(0), 1, 2);
+            
+            groups = reader.getRowGroups(2);
+            assertThat(groups.size(), is(1));
+            assertGroup(groups.get(0), 1, 2);
+            
+            groups = reader.getRowGroups(3);
+            assertThat(groups.size(), is(0));
+            
+            groups = reader.getRowGroups(4);
+            assertThat(groups.size(), is(1));
+            assertGroup(groups.get(0), 4, 5);
+            
+            groups = reader.getRowGroups(5);
+            assertThat(groups.size(), is(1));
+            assertGroup(groups.get(0), 4, 5);
+            
+            groups = reader.getRowGroups(6);
+            assertThat(groups.size(), is(0));
+        }
+    }
+    
+    /**
+     * Tests the correct retrieval of groups for specified rows. This sheet has nested groups
+     * 
+     * @throws IllegalStateException Should not occur, otherwise the tested Excel file is password protected.
+     * @throws IOException Should not occur, otherwise the tested Excel document cannot be opened.
+     * @throws FormatException Should not occur, otherwise the tested Excel cannot be parsed
+     */
+    @Test
+    public void testGetRowGroupsNested() throws IllegalStateException, IOException, FormatException {
+        File inputFile = new File(AllTests.TESTDATA, "GroupedValues2.xlsx");
+        
+        try (ExcelBook book = new ExcelBook(inputFile, true)) {
+            assertThat(book.getTableNames(), hasItem("Test Sheet"));
+            
+            ExcelSheetReader reader = book.getReader("Test Sheet");
+            
+            String[][] allRows = reader.readFull();
+            assertThat(allRows.length, is(6));
+            
+            List<Group> groups = reader.getRowGroups(0);
+            assertThat(groups.size(), is(0));
+            
+            groups = reader.getRowGroups(1);
+            assertThat(groups.size(), is(2));
+            assertGroup(groups.get(0), 1, 2);
+            assertGroup(groups.get(1), 1, 5);
+            
+            groups = reader.getRowGroups(3);
+            assertThat(groups.size(), is(1));
+            assertGroup(groups.get(0), 1, 5);
+        }
+    }
+    
+    /**
      * Asserts the correct setting of the tested group.
      * @param group The group to test.
      * @param startIndex The expected first row of the group (starts a 0).
