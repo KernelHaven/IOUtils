@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -214,6 +216,23 @@ public class ExcelBook implements ITableCollection {
         Set<File> result = new HashSet<>();
         result.add(destinationFile);
         return result;
+    }
+    
+    /**
+     * Returns the style for writing header elements in this complete workbook.
+     * @return The same style instance for all sheets of the same workbook to highlight header elements,
+     *     or <tt>null</tt> if this workbook was opened in read only mode.
+     */
+    synchronized CellStyle getHeaderStyle() {
+        CellStyle style = null;
+        if (mode != Mode.READ_ONLY) {
+            style = wb.createCellStyle();
+            Font font = wb.createFont();
+            font.setBold(true);
+            style.setFont(font);
+        }
+        
+        return style;
     }
     
     /**

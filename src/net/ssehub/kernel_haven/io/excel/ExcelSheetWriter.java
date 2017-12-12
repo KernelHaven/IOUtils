@@ -62,6 +62,22 @@ public class ExcelSheetWriter extends AbstractTableWriter {
         }
     }
     
+    @Override
+    public void writeHeader(String... fields) throws IOException {
+        // make sure we don't modify the content while the workbook is writing to disk
+        synchronized (wb) {
+            List<String> cellValues = prepareFields(fields);
+            if (null != cellValues) {
+                Row row = sheet.createRow(currentRow++);
+                for (int i = 0; i < cellValues.size(); i++) {
+                    Cell cell = row.createCell(i);
+                    cell.setCellStyle(wb.getHeaderStyle());
+                    cell.setCellValue(cellValues.get(i));
+                }
+            }
+        }
+    }
+    
     /**
      * Splits text values, which are too long into separate fields to avoid {@link IllegalArgumentException}s.
      * Tries to split values at white space characters.
