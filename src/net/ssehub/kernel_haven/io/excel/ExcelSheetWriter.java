@@ -74,6 +74,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
                     cell.setCellStyle(wb.getHeaderStyle());
                     cell.setCellValue(cellValues.get(i));
                 }
+                sheet.createFreezePane(0, 1);
             }
         }
     }
