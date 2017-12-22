@@ -48,10 +48,10 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     }
 
     @Override
-    public void writeRow(String... fields) throws IOException {
+    public void writeRow(Object... columns) throws IOException {
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
-            List<String> cellValues = prepareFields(fields);
+            List<String> cellValues = prepareFields(columns);
             if (null != cellValues) {
                 Row row = sheet.createRow(currentRow++);
                 for (int i = 0; i < cellValues.size(); i++) {
@@ -63,7 +63,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     }
     
     @Override
-    public void writeHeader(String... fields) throws IOException {
+    public void writeHeader(Object... fields) throws IOException {
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
             List<String> cellValues = prepareFields(fields);
@@ -86,13 +86,13 @@ public class ExcelSheetWriter extends AbstractTableWriter {
      * @return The values to write, should be the same values unless there were some values to long.
      * <a href="https://stackoverflow.com/a/31937583">https://stackoverflow.com/a/31937583</a>
      */
-    private List<String> prepareFields(String... fields) {
+    private List<String> prepareFields(Object... fields) {
         List<String> result = null;
         if (null != fields) {
             result = new ArrayList<>();
             
             for (int i = 0; i < fields.length; i++) {
-                String fieldValue = fields[i];
+                String fieldValue = fields[i] != null ? fields[i].toString() : "";
                 while (fieldValue.length() > MAX_TEXT_LENGTH) {
                     String firstPart = fieldValue.substring(0, MAX_TEXT_LENGTH);
                     

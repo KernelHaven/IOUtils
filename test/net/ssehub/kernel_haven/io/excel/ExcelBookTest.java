@@ -531,7 +531,7 @@ public class ExcelBookTest {
             }
             
             ExcelSheetWriter writer = book.getWriter("Sheet");
-            writer.writeRow(str.toString());
+            writer.writeObject(str.toString());
             writer.close();
             
             ExcelSheetReader reader = book.getReader("Sheet");
