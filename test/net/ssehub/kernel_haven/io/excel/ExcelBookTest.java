@@ -520,7 +520,7 @@ public class ExcelBookTest {
      */
     @Test
     public void testWriteLongField() throws IOException, IllegalStateException, FormatException {
-        File dst = new File("testdata/tmp.xls");
+        File dst = new File("testdata/tmpLongFields.xls");
         final int LENGTH = SpreadsheetVersion.EXCEL2007.getMaxTextLength() + 200;
         
         try (ExcelBook book = new ExcelBook(dst)) {
@@ -545,6 +545,78 @@ public class ExcelBookTest {
         } finally {
             dst.delete();
         }
+    }
+
+    /**
+     * Tests that writing different data types gets formatted correctly.
+     * 
+     * @throws IOException unwanted.
+     * @throws FormatException unwanted.
+     */
+    @Test
+    public void testWriteDifferentTypes() throws IOException, FormatException {
+        File dst = new File("testdata/tmpDifferentTypes.xlsx");
+        
+        try (ExcelBook book = new ExcelBook(dst)) {
+            
+            ExcelSheetWriter writer = book.getWriter("Sheet");
+            writer.writeRow("String", "A String Value");
+            writer.writeRow("Integer", 13);
+            writer.writeRow("Double", -13.5);
+            writer.writeRow("Null", null);
+            writer.writeRow("Boolean(s)", true, false);
+            writer.close();
+            
+            ExcelSheetReader reader = book.getReader("Sheet");
+            String[][] content = reader.readFull();
+            
+            assertThat(content, is(new String[][] {
+                {"String", "A String Value"},
+                {"Integer", "13.0"},
+                {"Double", "-13.5"},
+                {"Null", ""},
+                {"Boolean(s)", "true", "false"},
+            }));
+            
+        } finally {
+            dst.delete();
+        }
+        
+    }
+    
+    /**
+     * Tests writing a header line.
+     * 
+     * @throws IOException unwanted.
+     * @throws FormatException unwanted.
+     */
+    @Test
+    public void testWriteHeader() throws IOException, FormatException {
+        File dst = new File("testdata/tmpWriteHeader.xlsx");
+        
+        try (ExcelBook book = new ExcelBook(dst)) {
+            
+            ExcelSheetWriter writer = book.getWriter("Sheet");
+            writer.writeHeader("Context", "Value");
+            writer.writeRow("A", "1");
+            writer.writeRow("B", "2");
+            writer.writeRow("C", "3");
+            writer.close();
+            
+            ExcelSheetReader reader = book.getReader("Sheet");
+            String[][] content = reader.readFull();
+            
+            assertThat(content, is(new String[][] {
+                {"Context", "Value"},
+                {"A", "1"},
+                {"B", "2"},
+                {"C", "3"},
+            }));
+            
+        } finally {
+            dst.delete();
+        }
+        
     }
     
 }

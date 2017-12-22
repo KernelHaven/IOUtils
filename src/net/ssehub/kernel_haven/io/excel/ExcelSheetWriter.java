@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -51,12 +52,12 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     public void writeRow(Object... columns) throws IOException {
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
-            List<String> cellValues = prepareFields(columns);
+            List<CellValue> cellValues = prepareFields(columns);
             if (null != cellValues) {
                 Row row = sheet.createRow(currentRow++);
                 for (int i = 0; i < cellValues.size(); i++) {
                     Cell cell = row.createCell(i);
-                    cell.setCellValue(cellValues.get(i));
+                    cellValues.get(i).applyTo(cell);
                 }
             }
         }
@@ -66,13 +67,13 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     public void writeHeader(Object... fields) throws IOException {
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
-            List<String> cellValues = prepareFields(fields);
+            List<CellValue> cellValues = prepareFields(fields);
             if (null != cellValues) {
                 Row row = sheet.createRow(currentRow++);
                 for (int i = 0; i < cellValues.size(); i++) {
                     Cell cell = row.createCell(i);
                     cell.setCellStyle(wb.getHeaderStyle());
-                    cell.setCellValue(cellValues.get(i));
+                    cellValues.get(i).applyTo(cell);
                 }
                 sheet.createFreezePane(0, 1);
             }
@@ -80,19 +81,82 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     }
     
     /**
+     * A single cell value, with a type, to be written into the sheet.
+     */
+    private static class CellValue {
+        
+        private CellType type;
+        
+        private Object value;
+        
+        public CellValue(CellType type, Object value) {
+            this.type = type;
+            this.value = value;
+        }
+        
+        /**
+         * Applies this value to the given cell. Properly sets the cell type.
+         * 
+         * @param cell The cell to apply this value to.
+         * 
+         * @throws ClassCastException If the type does not match the value. Shouldn't happen.
+         */
+        public void applyTo(Cell cell) {
+            cell.setCellType(type);
+            
+            switch (type) {
+            case BLANK:
+                // no need to set a value
+                break;
+                
+            case NUMERIC:
+                cell.setCellValue(((Number) value).doubleValue());
+                break;
+                
+            case BOOLEAN:
+                cell.setCellValue((Boolean) value);
+                break;
+                
+            default:
+                cell.setCellValue(value.toString());
+                break;
+            }
+        }
+        
+    }
+    
+    /**
+     * Converts the given fields into {@link CellValue}s.
+     * <br />
      * Splits text values, which are too long into separate fields to avoid {@link IllegalArgumentException}s.
      * Tries to split values at white space characters.
+     * <a href="https://stackoverflow.com/a/31937583">https://stackoverflow.com/a/31937583</a>
+     * 
      * @param fields The field values of a row to store.
      * @return The values to write, should be the same values unless there were some values to long.
-     * <a href="https://stackoverflow.com/a/31937583">https://stackoverflow.com/a/31937583</a>
+     * 
      */
-    private List<String> prepareFields(Object... fields) {
-        List<String> result = null;
-        if (null != fields) {
-            result = new ArrayList<>();
-            
-            for (int i = 0; i < fields.length; i++) {
-                String fieldValue = fields[i] != null ? fields[i].toString() : "";
+    private List<CellValue> prepareFields(Object... fields) {
+        List<CellValue> result = new ArrayList<>();
+        
+        for (int i = 0; i < fields.length; i++) {
+            if (fields[i] == null) {
+                // empty fields are "blank" type
+                result.add(new CellValue(CellType.BLANK, null));
+                
+            } else if (fields[i] instanceof Number) {
+                // numbers get the "numeric" type
+                result.add(new CellValue(CellType.NUMERIC, fields[i]));
+                
+            } else if (fields[i] instanceof Boolean) {
+                // booleans are "boolean" type
+                result.add(new CellValue(CellType.BOOLEAN, fields[i]));
+                
+            } else {
+                // everything else is a "string" type
+                // strings may be too long, and thus need to be split up
+                
+                String fieldValue = fields[i].toString();
                 while (fieldValue.length() > MAX_TEXT_LENGTH) {
                     String firstPart = fieldValue.substring(0, MAX_TEXT_LENGTH);
                     
@@ -103,14 +167,14 @@ public class ExcelSheetWriter extends AbstractTableWriter {
                     }
                     
                     firstPart = fieldValue.substring(0, pos);
-                    result.add(firstPart);
+                    result.add(new CellValue(CellType.STRING, firstPart));
                     pos = Math.min(pos, fieldValue.length() - 1);
                     fieldValue = fieldValue.substring(pos);
                 }
-                result.add(fieldValue);
+                result.add(new CellValue(CellType.STRING, fieldValue));
             }
-            
         }
+            
         
         return result;
     }
