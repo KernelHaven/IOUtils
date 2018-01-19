@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.io.excel;
 
+import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -134,11 +136,11 @@ public class ExcelBook implements ITableCollection {
     }
     
     @Override
-    public synchronized @NonNull Set<String> getTableNames() throws IOException {
-        Set<String> result = new HashSet<>();
+    public synchronized @NonNull Set<@NonNull String> getTableNames() throws IOException {
+        Set<@NonNull String> result = new HashSet<>();
         
         for (Sheet sheet : wb) {
-            result.add(sheet.getSheetName());
+            result.add(notNull(sheet.getSheetName()));
         }
         
         return result;
@@ -219,8 +221,8 @@ public class ExcelBook implements ITableCollection {
     }
 
     @Override
-    public @NonNull Set<File> getFiles() throws IOException {
-        Set<File> result = new HashSet<>();
+    public @NonNull Set<@NonNull File> getFiles() throws IOException {
+        Set<@NonNull File> result = new HashSet<>();
         result.add(destinationFile);
         return result;
     }

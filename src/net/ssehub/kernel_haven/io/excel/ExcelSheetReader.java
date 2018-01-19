@@ -170,7 +170,7 @@ public class ExcelSheetReader implements ITableReader {
     }
 
     @Override
-    public @Nullable String[] readNextRow() throws IOException {
+    public @NonNull String @Nullable [] readNextRow() throws IOException {
         String[] result;
         if (iterator.hasNext()) {
             result = iterator.next();

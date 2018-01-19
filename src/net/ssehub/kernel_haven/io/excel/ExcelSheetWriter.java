@@ -51,7 +51,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     }
 
     @Override
-    public void writeRow(@NonNull Object... columns) throws IOException {
+    public void writeRow(@Nullable Object @NonNull ... columns) throws IOException {
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
             List<CellValue> cellValues = prepareFields(columns);
@@ -66,7 +66,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     }
     
     @Override
-    public void writeHeader(@NonNull Object... fields) throws IOException {
+    public void writeHeader(@Nullable Object @NonNull ... fields) throws IOException {
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
             List<CellValue> cellValues = prepareFields(fields);
@@ -138,7 +138,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
      * @return The values to write, should be the same values unless there were some values to long.
      * 
      */
-    private @NonNull List<CellValue> prepareFields(@NonNull Object... fields) {
+    private @NonNull List<CellValue> prepareFields(@Nullable Object @NonNull ... fields) {
         List<CellValue> result = new ArrayList<>();
         
         for (int i = 0; i < fields.length; i++) {
