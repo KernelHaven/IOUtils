@@ -13,6 +13,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import net.ssehub.kernel_haven.util.io.ITableReader;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
+import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
 /**
  * A reader for a single sheet inside an excel file. Instances are created by {@link ExcelBook}s.
@@ -23,22 +25,22 @@ import net.ssehub.kernel_haven.util.io.ITableReader;
  */
 public class ExcelSheetReader implements ITableReader {
 
-    private Sheet sheet;
+    private @NonNull Sheet sheet;
     
-    private String sheetName;
+    private @NonNull String sheetName;
     
-    private List<String[]> contents;
+    private @NonNull List<String[]> contents;
 
-    private List<Group> groupedRows;
+    private @NonNull List<Group> groupedRows;
     
     private boolean ignoreEmptyRows;
     
     /**
      * The current position for {@link #readNextRow()}. Reset when {@link #close()} is called.
      */
-    private Iterator<String[]> iterator;
+    private @NonNull Iterator<String[]> iterator;
     
-    ExcelSheetReader(Sheet sheet, boolean ignoreEmptyRows) {
+    ExcelSheetReader(@NonNull Sheet sheet, boolean ignoreEmptyRows) {
         this.sheet = sheet;
         this.sheetName = sheet.getSheetName();
         this.ignoreEmptyRows = ignoreEmptyRows;
@@ -131,11 +133,11 @@ public class ExcelSheetReader implements ITableReader {
         }
     }
     
-    public String getSheetName() {
+    public @NonNull String getSheetName() {
         return sheetName;
     }
     
-    public List<Group> getGroupedRows() {
+    public @NonNull List<Group> getGroupedRows() {
         return groupedRows;
     }
     
@@ -147,7 +149,7 @@ public class ExcelSheetReader implements ITableReader {
      * @param rowIndex A 0-based index for which the groups shall be returned.
      * @return A list of grouped rows, may be empty.
      */
-    public List<Group> getRowGroups(int rowIndex) {
+    public @NonNull List<Group> getRowGroups(int rowIndex) {
         List<Group> relevantGroups = new ArrayList<>();
         for (Group rowGroup : groupedRows) {
             if (rowGroup.getStartIndex() <= rowIndex && rowGroup.getEndIndex() >= rowIndex) {
@@ -168,7 +170,7 @@ public class ExcelSheetReader implements ITableReader {
     }
 
     @Override
-    public String[] readNextRow() throws IOException {
+    public @Nullable String[] readNextRow() throws IOException {
         String[] result;
         if (iterator.hasNext()) {
             result = iterator.next();

@@ -21,6 +21,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.io.ITableCollection;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
+import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
 /**
  * A wrapper around an excel book. A book contains several sheets. The individual sheets can be accessed through
@@ -45,7 +47,7 @@ public class ExcelBook implements ITableCollection {
     
     private boolean ignoreEmptyRows;
     private Mode mode;
-    private File destinationFile;
+    private @NonNull File destinationFile;
     
     private Set<ExcelSheetWriter> openWriters;
     
@@ -59,7 +61,7 @@ public class ExcelBook implements ITableCollection {
      * @throws FormatException if the contents of the file cannot be parsed
      * @throws IllegalStateException If the workbook given is password protected
      */
-    public ExcelBook(File destinationFile) throws IOException, IllegalStateException, FormatException {
+    public ExcelBook(@NonNull File destinationFile) throws IOException, IllegalStateException, FormatException {
         this(destinationFile, false);
     }
     
@@ -74,7 +76,7 @@ public class ExcelBook implements ITableCollection {
      * @throws FormatException if the contents of the file cannot be parsed
      * @throws IllegalStateException If the workbook given is password protected
      */
-    public ExcelBook(File destinationFile, boolean ignoreEmptyRows) throws IOException, IllegalStateException,
+    public ExcelBook(@NonNull File destinationFile, boolean ignoreEmptyRows) throws IOException, IllegalStateException,
         FormatException {
         
         this.ignoreEmptyRows = ignoreEmptyRows;
@@ -106,7 +108,7 @@ public class ExcelBook implements ITableCollection {
      * 
      * @return Readers for all sheets of the Excel document.
      */
-    public synchronized List<ExcelSheetReader> getAllSheetReaders() {
+    public synchronized @NonNull List<ExcelSheetReader> getAllSheetReaders() {
         List<ExcelSheetReader> result = new ArrayList<>();
         
         for (Sheet sheet : wb) {
@@ -125,14 +127,14 @@ public class ExcelBook implements ITableCollection {
      * @throws IllegalArgumentException if the index is out of range (index
      *            &lt; 0 || index &gt;= getNumberOfSheets()).
      */
-    public synchronized ExcelSheetReader getReader(int index) {
+    public synchronized @NonNull ExcelSheetReader getReader(int index) {
         Sheet sheet = wb.getSheetAt(index);
         
         return new ExcelSheetReader(sheet, ignoreEmptyRows);
     }
     
     @Override
-    public synchronized Set<String> getTableNames() throws IOException {
+    public synchronized @NonNull Set<String> getTableNames() throws IOException {
         Set<String> result = new HashSet<>();
         
         for (Sheet sheet : wb) {
@@ -143,7 +145,7 @@ public class ExcelBook implements ITableCollection {
     }
     
     @Override
-    public synchronized ExcelSheetReader getReader(String name) {
+    public synchronized @NonNull ExcelSheetReader getReader(@NonNull String name) throws IOException {
         ExcelSheetReader result = null;
         for (Sheet sheet : wb) {
             if (sheet.getSheetName().equals(name)) {
@@ -151,11 +153,16 @@ public class ExcelBook implements ITableCollection {
                 break;
             }
         }
+        
+        if (result == null) {
+            throw new IOException("Workbook does not contain a sheet with name " + name);
+        }
+        
         return result;
     }
 
     @Override
-    public synchronized ExcelSheetWriter getWriter(String name) throws IOException {
+    public synchronized @NonNull ExcelSheetWriter getWriter(@NonNull String name) throws IOException {
         switch (mode) {
         case READ_ONLY:
             throw new UnsupportedOperationException("Sheet was oppened in read only mode: "
@@ -212,7 +219,7 @@ public class ExcelBook implements ITableCollection {
     }
 
     @Override
-    public Set<File> getFiles() throws IOException {
+    public @NonNull Set<File> getFiles() throws IOException {
         Set<File> result = new HashSet<>();
         result.add(destinationFile);
         return result;
@@ -223,7 +230,7 @@ public class ExcelBook implements ITableCollection {
      * @return The same style instance for all sheets of the same workbook to highlight header elements,
      *     or <tt>null</tt> if this workbook was opened in read only mode.
      */
-    synchronized CellStyle getHeaderStyle() {
+    synchronized @Nullable CellStyle getHeaderStyle() {
         CellStyle style = null;
         if (mode != Mode.READ_ONLY) {
             style = wb.createCellStyle();
@@ -242,7 +249,7 @@ public class ExcelBook implements ITableCollection {
      *     be created, or cannot be opened for any other reason, or if anything could not be written
      * @throws IllegalStateException If a future version of this class does not consider all possible states
      */
-    synchronized void flush(ExcelSheetWriter writer) throws IOException, IllegalStateException {
+    synchronized void flush(@NonNull ExcelSheetWriter writer) throws IOException, IllegalStateException {
         openWriters.remove(writer);
         write();
     }

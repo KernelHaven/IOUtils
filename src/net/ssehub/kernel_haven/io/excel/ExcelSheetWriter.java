@@ -11,6 +11,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import net.ssehub.kernel_haven.util.io.AbstractTableWriter;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
+import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
 /**
  * Writes a table to an existing sheet of an existing Excel workbook (XLS/XLSX-File).
@@ -23,16 +25,16 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     
     private static final int MAX_TEXT_LENGTH = SpreadsheetVersion.EXCEL2007.getMaxTextLength();
     
-    private Sheet sheet;
+    private @NonNull Sheet sheet;
     private int currentRow;
     private ExcelBook wb;
     
-    ExcelSheetWriter(Sheet sheet) {
+    ExcelSheetWriter(@NonNull Sheet sheet) {
         this.sheet = sheet;
         currentRow = sheet.getPhysicalNumberOfRows();
     }
     
-    ExcelSheetWriter(ExcelBook wb, Sheet sheet) {
+    ExcelSheetWriter(@NonNull ExcelBook wb, @NonNull Sheet sheet) {
         this(sheet);
         this.wb = wb;
     }
@@ -49,7 +51,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     }
 
     @Override
-    public void writeRow(Object... columns) throws IOException {
+    public void writeRow(@NonNull Object... columns) throws IOException {
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
             List<CellValue> cellValues = prepareFields(columns);
@@ -64,7 +66,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     }
     
     @Override
-    public void writeHeader(Object... fields) throws IOException {
+    public void writeHeader(@NonNull Object... fields) throws IOException {
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
             List<CellValue> cellValues = prepareFields(fields);
@@ -85,11 +87,11 @@ public class ExcelSheetWriter extends AbstractTableWriter {
      */
     private static class CellValue {
         
-        private CellType type;
+        private @NonNull CellType type;
         
-        private Object value;
+        private @Nullable Object value;
         
-        public CellValue(CellType type, Object value) {
+        public CellValue(@NonNull CellType type, @Nullable Object value) {
             this.type = type;
             this.value = value;
         }
@@ -101,7 +103,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
          * 
          * @throws ClassCastException If the type does not match the value. Shouldn't happen.
          */
-        public void applyTo(Cell cell) {
+        public void applyTo(@NonNull Cell cell) {
             cell.setCellType(type);
             
             switch (type) {
@@ -136,7 +138,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
      * @return The values to write, should be the same values unless there were some values to long.
      * 
      */
-    private List<CellValue> prepareFields(Object... fields) {
+    private @NonNull List<CellValue> prepareFields(@NonNull Object... fields) {
         List<CellValue> result = new ArrayList<>();
         
         for (int i = 0; i < fields.length; i++) {
