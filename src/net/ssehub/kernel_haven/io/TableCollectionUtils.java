@@ -7,6 +7,7 @@ import net.ssehub.kernel_haven.io.excel.ExcelBook;
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.io.ITableCollection;
 import net.ssehub.kernel_haven.util.io.csv.CsvFileSet;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
  * Utilities for {@link ITableCollection}s.
@@ -34,7 +35,7 @@ public class TableCollectionUtils {
      * 
      * @throws IOException If creating the {@link ITableCollection} fails, or the file suffix is not supported.
      */
-    public static ITableCollection openExcelOrCsvCollection(File file) throws IOException {
+    public static @NonNull ITableCollection openExcelOrCsvCollection(@NonNull File file) throws IOException {
         ITableCollection result;
         String fileName = file.getName();
         

@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.io.excel;
 
+import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,16 +29,12 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     
     private @NonNull Sheet sheet;
     private int currentRow;
-    private ExcelBook wb;
-    
-    ExcelSheetWriter(@NonNull Sheet sheet) {
-        this.sheet = sheet;
-        currentRow = sheet.getPhysicalNumberOfRows();
-    }
+    private @NonNull ExcelBook wb;
     
     ExcelSheetWriter(@NonNull ExcelBook wb, @NonNull Sheet sheet) {
-        this(sheet);
         this.wb = wb;
+        this.sheet = sheet;
+        currentRow = sheet.getPhysicalNumberOfRows();
     }
 
     @Override
@@ -45,9 +43,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
          * In principle no needed, closing operation is handled in Workbook.
          * However, flushing current data is possible
          */
-        if (null != wb) {
-            wb.flush(this);
-        }
+        wb.flush(this);
     }
 
     @Override
@@ -55,12 +51,10 @@ public class ExcelSheetWriter extends AbstractTableWriter {
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
             List<CellValue> cellValues = prepareFields(columns);
-            if (null != cellValues) {
-                Row row = sheet.createRow(currentRow++);
-                for (int i = 0; i < cellValues.size(); i++) {
-                    Cell cell = row.createCell(i);
-                    cellValues.get(i).applyTo(cell);
-                }
+            Row row = sheet.createRow(currentRow++);
+            for (int i = 0; i < cellValues.size(); i++) {
+                Cell cell = notNull(row.createCell(i));
+                cellValues.get(i).applyTo(cell);
             }
         }
     }
@@ -70,15 +64,13 @@ public class ExcelSheetWriter extends AbstractTableWriter {
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
             List<CellValue> cellValues = prepareFields(fields);
-            if (null != cellValues) {
-                Row row = sheet.createRow(currentRow++);
-                for (int i = 0; i < cellValues.size(); i++) {
-                    Cell cell = row.createCell(i);
-                    cell.setCellStyle(wb.getHeaderStyle());
-                    cellValues.get(i).applyTo(cell);
-                }
-                sheet.createFreezePane(0, 1);
+            Row row = sheet.createRow(currentRow++);
+            for (int i = 0; i < cellValues.size(); i++) {
+                Cell cell = row.createCell(i);
+                cell.setCellStyle(wb.getHeaderStyle());
+                cellValues.get(i).applyTo(cell);
             }
+            sheet.createFreezePane(0, 1);
         }
     }
     
@@ -110,17 +102,18 @@ public class ExcelSheetWriter extends AbstractTableWriter {
             case BLANK:
                 // no need to set a value
                 break;
+                // only BLANK has null as possible value, so its safe to assume that value != null now.
                 
             case NUMERIC:
-                cell.setCellValue(((Number) value).doubleValue());
+                cell.setCellValue(((Number) notNull(value)).doubleValue());
                 break;
                 
             case BOOLEAN:
-                cell.setCellValue((Boolean) value);
+                cell.setCellValue((Boolean) notNull(value));
                 break;
                 
             default:
-                cell.setCellValue(value.toString());
+                cell.setCellValue(notNull(value).toString());
                 break;
             }
         }
@@ -141,24 +134,25 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     private @NonNull List<CellValue> prepareFields(@Nullable Object @NonNull ... fields) {
         List<CellValue> result = new ArrayList<>();
         
-        for (int i = 0; i < fields.length; i++) {
-            if (fields[i] == null) {
+        for (Object field : fields) {
+            
+            if (field == null) {
                 // empty fields are "blank" type
                 result.add(new CellValue(CellType.BLANK, null));
                 
-            } else if (fields[i] instanceof Number) {
+            } else if (field instanceof Number) {
                 // numbers get the "numeric" type
-                result.add(new CellValue(CellType.NUMERIC, fields[i]));
+                result.add(new CellValue(CellType.NUMERIC, field));
                 
-            } else if (fields[i] instanceof Boolean) {
+            } else if (field instanceof Boolean) {
                 // booleans are "boolean" type
-                result.add(new CellValue(CellType.BOOLEAN, fields[i]));
+                result.add(new CellValue(CellType.BOOLEAN, field));
                 
             } else {
                 // everything else is a "string" type
                 // strings may be too long, and thus need to be split up
                 
-                String fieldValue = fields[i].toString();
+                String fieldValue = field.toString();
                 while (fieldValue.length() > MAX_TEXT_LENGTH) {
                     String firstPart = fieldValue.substring(0, MAX_TEXT_LENGTH);
                     

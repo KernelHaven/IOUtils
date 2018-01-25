@@ -18,6 +18,7 @@ import org.junit.Test;
 
 import net.ssehub.kernel_haven.io.AllTests;
 import net.ssehub.kernel_haven.util.FormatException;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
  * Tests the {@link ExcelBook} and {@link ExcelSheetReader} classes.
@@ -241,7 +242,7 @@ public class ExcelBookTest {
      * @param sheetName The name of the sheet to load.
      * @return Will return the content of the sheet (if it cannot be loaded, the test will fail already at this part).
      */
-    private String[][] loadSheet(String fileName, String sheetName) {
+    private String[][] loadSheet(String fileName, @NonNull String sheetName) {
         ExcelSheetReader reader = null;
         File inputFile = new File(AllTests.TESTDATA, fileName);
         String[][] content = null;
@@ -381,6 +382,7 @@ public class ExcelBookTest {
      * @throws FormatException unwanted.
      */
     @Test
+    @SuppressWarnings("null")
     public void testGetFiles() throws IOException, IllegalStateException, FormatException {
         try (ExcelBook book = new ExcelBook(new File("test.xls"))) {
             HashSet<File> expected = new HashSet<>();
@@ -411,6 +413,7 @@ public class ExcelBookTest {
      * @throws FormatException unwanted.
      */
     @Test
+    @SuppressWarnings("null")
     public void testGetAllSheetReaders() throws IOException, IllegalStateException, FormatException {
         try (ExcelBook book = new ExcelBook(new File("testdata/MultipleSheets.xlsx"))) {
             List<ExcelSheetReader> readers = book.getAllSheetReaders();
@@ -437,6 +440,7 @@ public class ExcelBookTest {
      * @throws FormatException unwanted.
      */
     @Test
+    @SuppressWarnings("null")
     public void testReadEmptySheet() throws IOException, IllegalStateException, FormatException {
         try (ExcelBook book = new ExcelBook(new File("testdata/EmptySheet.xlsx"))) {
             try (ExcelSheetReader reader = book.getReader(0)) {
@@ -466,6 +470,7 @@ public class ExcelBookTest {
      * @throws FormatException unwanted.
      */
     @Test
+    @SuppressWarnings("null")
     public void testCreateSameSheetTwice() throws IOException, IllegalStateException, FormatException {
         File dst = new File("testdata/tmp.xls");
         try (ExcelBook book = new ExcelBook(dst)) {
@@ -494,6 +499,7 @@ public class ExcelBookTest {
      * @throws FormatException unwanted.
      */
     @Test
+    @SuppressWarnings("null")
     public void testReadDifferentContentTypes() throws IOException, IllegalStateException, FormatException {
         try (ExcelBook book = new ExcelBook(new File("testdata/DifferentContentTypes.xlsx"))) {
             ExcelSheetReader reader = book.getReader(0);
@@ -519,6 +525,7 @@ public class ExcelBookTest {
      * @throws FormatException unwanted.
      */
     @Test
+    @SuppressWarnings("null")
     public void testWriteLongField() throws IOException, IllegalStateException, FormatException {
         File dst = new File("testdata/tmpLongFields.xls");
         final int LENGTH = SpreadsheetVersion.EXCEL2007.getMaxTextLength() + 200;

@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.io.excel;
 
+import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
+
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -29,27 +31,27 @@ public class ExcelSheetReader implements ITableReader {
     
     private @NonNull String sheetName;
     
-    private @NonNull List<String[]> contents;
+    private @NonNull List<@NonNull String[]> contents;
 
-    private @NonNull List<Group> groupedRows;
+    private @NonNull List<@NonNull Group> groupedRows;
     
     private boolean ignoreEmptyRows;
     
     /**
      * The current position for {@link #readNextRow()}. Reset when {@link #close()} is called.
      */
-    private @NonNull Iterator<String[]> iterator;
+    private @NonNull Iterator<@NonNull String[]> iterator;
     
     ExcelSheetReader(@NonNull Sheet sheet, boolean ignoreEmptyRows) {
         this.sheet = sheet;
-        this.sheetName = sheet.getSheetName();
+        this.sheetName = notNull(sheet.getSheetName());
         this.ignoreEmptyRows = ignoreEmptyRows;
         this.contents = new ArrayList<>();
         this.groupedRows = new ArrayList<>();
         
         read();
         
-        this.iterator = contents.iterator(); 
+        this.iterator = notNull(contents.iterator()); 
     }
     
     private void read() {
@@ -119,7 +121,7 @@ public class ExcelSheetReader implements ITableReader {
                 while (rowContents.size() < nColumns) {
                     rowContents.add("");
                 }
-                this.contents.add(rowContents.toArray(new String[0]));
+                this.contents.add(rowContents.toArray(new @NonNull String[0]));
             }
             previousRow++;
         }
@@ -137,7 +139,7 @@ public class ExcelSheetReader implements ITableReader {
         return sheetName;
     }
     
-    public @NonNull List<Group> getGroupedRows() {
+    public @NonNull List<@NonNull Group> getGroupedRows() {
         return groupedRows;
     }
     
@@ -149,8 +151,8 @@ public class ExcelSheetReader implements ITableReader {
      * @param rowIndex A 0-based index for which the groups shall be returned.
      * @return A list of grouped rows, may be empty.
      */
-    public @NonNull List<Group> getRowGroups(int rowIndex) {
-        List<Group> relevantGroups = new ArrayList<>();
+    public @NonNull List<@NonNull Group> getRowGroups(int rowIndex) {
+        List<@NonNull Group> relevantGroups = new ArrayList<>();
         for (Group rowGroup : groupedRows) {
             if (rowGroup.getStartIndex() <= rowIndex && rowGroup.getEndIndex() >= rowIndex) {
                 relevantGroups.add(rowGroup);
@@ -160,18 +162,18 @@ public class ExcelSheetReader implements ITableReader {
         // Sorts elements by start index in descending order
         relevantGroups.sort((g1, g2) -> Integer.compare(g2.getStartIndex(), g1.getStartIndex()));
         
-        return Collections.unmodifiableList(relevantGroups);
+        return notNull(Collections.unmodifiableList(relevantGroups));
     }
     
     @Override
     public void close() {
         // no need to close anything, just reset the iterator
-        iterator = contents.iterator();
+        iterator = notNull(contents.iterator());
     }
 
     @Override
     public @NonNull String @Nullable [] readNextRow() throws IOException {
-        String[] result;
+        @NonNull String[] result;
         if (iterator.hasNext()) {
             result = iterator.next();
         } else {

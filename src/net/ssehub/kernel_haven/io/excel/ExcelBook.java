@@ -45,13 +45,15 @@ public class ExcelBook implements ITableCollection {
         WRITE_NEW_WB;
     }
     
+    private static final Logger LOGGER = Logger.get();
+    
     private Workbook wb;
     
     private boolean ignoreEmptyRows;
     private Mode mode;
     private @NonNull File destinationFile;
     
-    private Set<ExcelSheetWriter> openWriters;
+    private Set<@NonNull ExcelSheetWriter> openWriters;
     
     /**
      * Default constructor for reading and writing a Excel documents (XLSX, XLS).
@@ -110,11 +112,11 @@ public class ExcelBook implements ITableCollection {
      * 
      * @return Readers for all sheets of the Excel document.
      */
-    public synchronized @NonNull List<ExcelSheetReader> getAllSheetReaders() {
-        List<ExcelSheetReader> result = new ArrayList<>();
+    public synchronized @NonNull List<@NonNull ExcelSheetReader> getAllSheetReaders() {
+        List<@NonNull ExcelSheetReader> result = new ArrayList<>();
         
         for (Sheet sheet : wb) {
-            result.add(new ExcelSheetReader(sheet, ignoreEmptyRows));
+            result.add(new ExcelSheetReader(notNull(sheet), ignoreEmptyRows));
         }
         
         return result;
@@ -130,7 +132,7 @@ public class ExcelBook implements ITableCollection {
      *            &lt; 0 || index &gt;= getNumberOfSheets()).
      */
     public synchronized @NonNull ExcelSheetReader getReader(int index) {
-        Sheet sheet = wb.getSheetAt(index);
+        Sheet sheet = notNull(wb.getSheetAt(index));
         
         return new ExcelSheetReader(sheet, ignoreEmptyRows);
     }
@@ -294,18 +296,18 @@ public class ExcelBook implements ITableCollection {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                Logger.get().logWarning("Error while ExcelBook is waiting for its sheets: " + e.getMessage());
+                LOGGER.logWarning("Error while ExcelBook is waiting for its sheets: " + e.getMessage());
             }
             attemptNo++;
         }
         
         // Close open writers
-        List<ExcelSheetWriter> tmp = new ArrayList<>(openWriters);
+        List<@NonNull ExcelSheetWriter> tmp = new ArrayList<>(openWriters);
         for (ExcelSheetWriter excelSheetWriter : tmp) {
             try {
                 flush(excelSheetWriter);
             } catch (IOException e) {
-                Logger.get().logError("Error while writing sheet: " + e.getMessage());
+                LOGGER.logError("Error while writing sheet: " + e.getMessage());
             }
         }
     }
