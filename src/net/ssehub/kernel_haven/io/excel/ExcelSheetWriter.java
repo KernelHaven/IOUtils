@@ -47,7 +47,8 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     }
 
     @Override
-    public void writeRow(@Nullable Object @NonNull ... columns) throws IOException {
+    public void writeRow(@Nullable Object /*@NonNull*/ ... columns) throws IOException {
+        // TODO: commented out @NonNull annotation because checkstyle can't parse it
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
             List<CellValue> cellValues = prepareFields(columns);
