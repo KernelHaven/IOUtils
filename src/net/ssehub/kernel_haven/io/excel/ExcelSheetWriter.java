@@ -61,7 +61,8 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     }
     
     @Override
-    public void writeHeader(@Nullable Object @NonNull ... fields) throws IOException {
+    public void writeHeader(@Nullable Object /*@NonNull*/ ... fields) throws IOException {
+        // TODO: commented out @NonNull annotation because checkstyle can't parse it
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
             List<CellValue> cellValues = prepareFields(fields);
@@ -132,7 +133,8 @@ public class ExcelSheetWriter extends AbstractTableWriter {
      * @return The values to write, should be the same values unless there were some values to long.
      * 
      */
-    private @NonNull List<CellValue> prepareFields(@Nullable Object @NonNull ... fields) {
+    private @NonNull List<CellValue> prepareFields(@Nullable Object /*@NonNull*/ ... fields) {
+        // TODO: commented out @NonNull annotation because checkstyle can't parse it
         List<CellValue> result = new ArrayList<>();
         
         for (Object field : fields) {
