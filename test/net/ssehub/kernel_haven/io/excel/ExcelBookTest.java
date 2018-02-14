@@ -29,6 +29,9 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
 public class ExcelBookTest {
     private static final File TMPFOLDER = new File(AllTests.TESTDATA, "tmpFiles");
 
+    /**
+     * Creates the {@link #TMPFOLDER}.
+     */
     @BeforeClass
     public static void setUpBeforeClass() {
         if (TMPFOLDER.exists()) {
@@ -261,6 +264,7 @@ public class ExcelBookTest {
     }
     
     /**
+     * Test writing a single sheet.
      * 
      * @throws IOException if an error occurs while reading the data (Must not occur during testing)
      * @throws FormatException if the contents of the file cannot be parsed (Must not occur during testing)
@@ -299,6 +303,7 @@ public class ExcelBookTest {
     }
     
     /**
+     * Tests writing multiple sheets.
      * 
      * @throws IOException if an error occurs while reading the data (Must not occur during testing)
      * @throws FormatException if the contents of the file cannot be parsed (Must not occur during testing)
@@ -422,9 +427,9 @@ public class ExcelBookTest {
             assertThat(readers.get(1).getSheetName(), is("Sheet2"));
             assertThat(readers.get(2).getSheetName(), is("Sheet3"));
             
-            assertThat(readers.get(0).readFull(), is(new String[][] { { "Sheet", "One" } }));
-            assertThat(readers.get(1).readFull(), is(new String[][] { { "Sheet", "Two" } }));
-            assertThat(readers.get(2).readFull(), is(new String[][] { { "Sheet", "Three" } }));
+            assertThat(readers.get(0).readFull(), is(new String[][] {{"Sheet", "One"}}));
+            assertThat(readers.get(1).readFull(), is(new String[][] {{"Sheet", "Two"}}));
+            assertThat(readers.get(2).readFull(), is(new String[][] {{"Sheet", "Three"}}));
             
             for (ExcelSheetReader reader : readers) {
                 reader.close();
@@ -484,7 +489,7 @@ public class ExcelBookTest {
             writer.close();
 
             ExcelSheetReader reader = book.getReader("Sheet");
-            assertThat(reader.readFull(), is(new String[][] { { "Other", "Test", "Data" } }));
+            assertThat(reader.readFull(), is(new String[][] {{"Other", "Test", "Data"}}));
             
         } finally {
             dst.delete();
@@ -505,12 +510,12 @@ public class ExcelBookTest {
             ExcelSheetReader reader = book.getReader(0);
             
             assertThat(reader.readFull(), is(new String[][] {
-                { "String", "Text" },
-                { "Numeric", "1.0" },
-                { "Boolean", "true" },
-                { "Formula", "3+2" },
-                { "Blank", "" },
-                { "Error", "4/0" },
+                {"String", "Text"},
+                {"Numeric", "1.0"},
+                {"Boolean", "true"},
+                {"Formula", "3+2"},
+                {"Blank", ""},
+                {"Error", "4/0"},
             }));
             
             reader.close();
@@ -528,12 +533,12 @@ public class ExcelBookTest {
     @SuppressWarnings("null")
     public void testWriteLongField() throws IOException, IllegalStateException, FormatException {
         File dst = new File("testdata/tmpLongFields.xls");
-        final int LENGTH = SpreadsheetVersion.EXCEL2007.getMaxTextLength() + 200;
+        final int length = SpreadsheetVersion.EXCEL2007.getMaxTextLength() + 200;
         
         try (ExcelBook book = new ExcelBook(dst)) {
             
             StringBuilder str = new StringBuilder();
-            for (int i = 0; i < LENGTH; i++) {
+            for (int i = 0; i < length; i++) {
                 str.append('a');
             }
             

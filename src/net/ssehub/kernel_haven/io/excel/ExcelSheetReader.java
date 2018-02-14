@@ -42,6 +42,12 @@ public class ExcelSheetReader implements ITableReader {
      */
     private @NonNull Iterator<@NonNull String[]> iterator;
     
+    /**
+     * Creates an reader for the given sheet.
+     * 
+     * @param sheet The sheet to create this reader for.
+     * @param ignoreEmptyRows Whether empty rows should be ignored or not.
+     */
     ExcelSheetReader(@NonNull Sheet sheet, boolean ignoreEmptyRows) {
         this.sheet = sheet;
         this.sheetName = notNull(sheet.getSheetName());
@@ -54,6 +60,9 @@ public class ExcelSheetReader implements ITableReader {
         this.iterator = notNull(contents.iterator()); 
     }
     
+    /**
+     * Reads the full sheet. After this, {@link #contents} is filled.
+     */
     private void read() {
         // Retrieves only the number of entries in first column (unsure if this is detailed enough)
         int nColumns = 0;
@@ -135,10 +144,20 @@ public class ExcelSheetReader implements ITableReader {
         }
     }
     
+    /**
+     * Returns the name of this sheet.
+     * 
+     * @return The name of this sheet.
+     */
     public @NonNull String getSheetName() {
         return sheetName;
     }
     
+    /**
+     * Returns a list of row groupings of this sheet.
+     * 
+     * @return A list containing all {@link Group}s of rows in this sheet.
+     */
     public @NonNull List<@NonNull Group> getGroupedRows() {
         return groupedRows;
     }

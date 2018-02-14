@@ -12,6 +12,11 @@ import net.ssehub.kernel_haven.io.excel.ExcelBook;
 import net.ssehub.kernel_haven.util.io.ITableCollection;
 import net.ssehub.kernel_haven.util.io.csv.CsvFileSet;
 
+/**
+ * Tests the {@link TableCollectionUtils}.
+ * 
+ * @author Adam
+ */
 public class TableCollectionUtilsTest {
 
     /**

@@ -31,6 +31,12 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     private int currentRow;
     private @NonNull ExcelBook wb;
     
+    /**
+     * Creates a sheet writer for the given sheet.
+     * 
+     * @param wb The workbook to write in. Used for synchronization only.
+     * @param sheet The sheet to write.
+     */
     ExcelSheetWriter(@NonNull ExcelBook wb, @NonNull Sheet sheet) {
         this.wb = wb;
         this.sheet = sheet;
@@ -85,6 +91,12 @@ public class ExcelSheetWriter extends AbstractTableWriter {
         
         private @Nullable Object value;
         
+        /**
+         * Creates a cell value.
+         * 
+         * @param type The type of this cell.
+         * @param value The value of this cell.
+         */
         public CellValue(@NonNull CellType type, @Nullable Object value) {
             this.type = type;
             this.value = value;

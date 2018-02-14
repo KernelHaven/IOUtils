@@ -35,6 +35,9 @@ import net.ssehub.kernel_haven.util.null_checks.Nullable;
  */
 public class ExcelBook implements ITableCollection {
     
+    /**
+     * The read/write mode to open an {@link ExcelBook} with.
+     */
     private static enum Mode {
         // Add further state if needed
         
