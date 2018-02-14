@@ -74,7 +74,6 @@ public class ExcelSheetReader implements ITableReader {
         int groupLevel = 0;
         int previousRow = -1;
         while (rowIterator.hasNext()) {
-            List<String> rowContents = new ArrayList<>();
             Row currentRow = rowIterator.next();
             int currentGroupLevel = currentRow.getOutlineLevel();
             
@@ -92,46 +91,8 @@ public class ExcelSheetReader implements ITableReader {
                 }
             }
             
-            Iterator<Cell> cellIterator = currentRow.iterator();
-            boolean isEmpty = true;
-            while (cellIterator.hasNext()) {
-                Cell currentCell = cellIterator.next();
-                
-                // Handle missing/undefined cells
-                while (currentCell.getColumnIndex() > rowContents.size()) {
-                    rowContents.add("");
-                }
-                
-                String value = null;
-                switch (currentCell.getCellTypeEnum()) {
-                case STRING:
-                    value = currentCell.getStringCellValue();
-                    break;
-                case NUMERIC:
-                    value = Double.toString(currentCell.getNumericCellValue());
-                    break;
-                case BOOLEAN:
-                    value = Boolean.toString(currentCell.getBooleanCellValue());
-                    break;
-                case FORMULA:
-                    value = currentCell.getCellFormula();
-                    break;
-                default: 
-                    value = currentCell.getStringCellValue();
-                    break;
-                }
-                
-                isEmpty &= value == null;
-                rowContents.add(value);
-            }
+            readSingleRow(nColumns, currentRow);
             
-            if (!ignoreEmptyRows || !isEmpty) {
-                // Handle missing/undefined cells at the end of row
-                while (rowContents.size() < nColumns) {
-                    rowContents.add("");
-                }
-                this.contents.add(rowContents.toArray(new @NonNull String[0]));
-            }
             previousRow++;
         }
         
@@ -141,6 +102,56 @@ public class ExcelSheetReader implements ITableReader {
             int lastRow = Math.min(previousRow, this.contents.size() - 1);
             this.groupedRows.add(new Group(groupingStart, lastRow));
             groupLevel--;
+        }
+    }
+
+    /**
+     * Reads a single row. Called inside {@link #read()}. Adds the result to {@link #contents}.
+     * 
+     * @param nColumns The expected number of columns (used to handle missing cells at the end of row).
+     * @param currentRow The row to read.
+     */
+    private void readSingleRow(int nColumns, @NonNull Row currentRow) {
+        List<String> rowContents = new ArrayList<>();
+        Iterator<Cell> cellIterator = currentRow.iterator();
+        boolean isEmpty = true;
+        while (cellIterator.hasNext()) {
+            Cell currentCell = cellIterator.next();
+            
+            // Handle missing/undefined cells
+            while (currentCell.getColumnIndex() > rowContents.size()) {
+                rowContents.add("");
+            }
+            
+            String value = null;
+            switch (currentCell.getCellTypeEnum()) {
+            case STRING:
+                value = currentCell.getStringCellValue();
+                break;
+            case NUMERIC:
+                value = Double.toString(currentCell.getNumericCellValue());
+                break;
+            case BOOLEAN:
+                value = Boolean.toString(currentCell.getBooleanCellValue());
+                break;
+            case FORMULA:
+                value = currentCell.getCellFormula();
+                break;
+            default: 
+                value = currentCell.getStringCellValue();
+                break;
+            }
+            
+            isEmpty &= value == null;
+            rowContents.add(value);
+        }
+        
+        if (!ignoreEmptyRows || !isEmpty) {
+            // Handle missing/undefined cells at the end of row
+            while (rowContents.size() < nColumns) {
+                rowContents.add("");
+            }
+            this.contents.add(rowContents.toArray(new @NonNull String[0]));
         }
     }
     
