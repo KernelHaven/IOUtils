@@ -204,12 +204,12 @@ public class ExcelBook implements ITableCollection {
             if (null == sheet) {
                 String cause = null != exception ? ", cause: " + exception.getMessage() : "";
                 throw new IOException("Could not create sheet \"" + safeName + "\"" + cause);
-            } else {
-                /* Add sheets at the front by default
-                 * This is done to show final results at the beginning of document and intermediate results
-                 * at the end of document.
-                 */
-                wb.setSheetOrder(sheet.getSheetName(), 0);
+//            } else {
+//                /* Add sheets at the front by default
+//                 * This is done to show final results at the beginning of document and intermediate results
+//                 * at the end of document.
+//                 */
+//                wb.setSheetOrder(sheet.getSheetName(), 0);
             }
             
             ExcelSheetWriter writer = new ExcelSheetWriter(this, sheet);
