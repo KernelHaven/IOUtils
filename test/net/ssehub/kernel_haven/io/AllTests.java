@@ -18,7 +18,7 @@ import net.ssehub.kernel_haven.io.excel.AllExcelTests;
     AllExcelTests.class,
     
     TableCollectionUtilsTest.class,
-})
+    })
 public class AllTests {
     
     public static final File TESTDATA = new File("testdata");

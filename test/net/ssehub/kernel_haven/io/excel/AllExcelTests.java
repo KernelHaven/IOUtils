@@ -12,7 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
     ExcelBookTest.class,
-})
+    })
 public class AllExcelTests {
 
 }
