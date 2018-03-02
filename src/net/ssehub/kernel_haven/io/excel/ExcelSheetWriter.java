@@ -49,12 +49,13 @@ public class ExcelSheetWriter extends AbstractTableWriter {
          * In principle no needed, closing operation is handled in Workbook.
          * However, flushing current data is possible
          */
-        wb.flush(this);
+        flush();
     }
 
     @Override
     public void writeRow(@Nullable Object /*@NonNull*/ ... columns) throws IOException {
         // TODO: commented out @NonNull annotation because checkstyle can't parse it
+        
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
             List<CellValue> cellValues = prepareFields(columns);
@@ -69,6 +70,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     @Override
     public void writeHeader(@Nullable Object /*@NonNull*/ ... fields) throws IOException {
         // TODO: commented out @NonNull annotation because checkstyle can't parse it
+        
         // make sure we don't modify the content while the workbook is writing to disk
         synchronized (wb) {
             List<CellValue> cellValues = prepareFields(fields);
@@ -188,6 +190,11 @@ public class ExcelSheetWriter extends AbstractTableWriter {
             
         
         return result;
+    }
+    
+    @Override
+    public void flush() throws IOException {
+        wb.flush(this);
     }
 
 }
