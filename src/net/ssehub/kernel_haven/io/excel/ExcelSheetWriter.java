@@ -45,11 +45,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
 
     @Override
     public void close() throws IOException {
-        /*
-         * In principle no needed, closing operation is handled in Workbook.
-         * However, flushing current data is possible
-         */
-        flush();
+        wb.closeWriter(this);
     }
 
     @Override
@@ -194,7 +190,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     
     @Override
     public void flush() throws IOException {
-        wb.flush(this);
+        wb.write();
     }
 
 }

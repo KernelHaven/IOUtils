@@ -256,18 +256,19 @@ public class ExcelBook implements ITableCollection {
      *     be created, or cannot be opened for any other reason, or if anything could not be written
      * @throws IllegalStateException If a future version of this class does not consider all possible states
      */
-    synchronized void flush(@NonNull ExcelSheetWriter writer) throws IOException, IllegalStateException {
+    synchronized void closeWriter(@NonNull ExcelSheetWriter writer) throws IOException, IllegalStateException {
         openWriters.remove(writer);
         write();
     }
 
     /**
      * Writes the passed values as long as the document was not opened in read only mode.
+     * 
      * @throws IOException if the file exists but is a directory rather than a regular file, does not exist but cannot
      *     be created, or cannot be opened for any other reason, or if anything could not be written
      * @throws IllegalStateException If a future version of this class does not consider all possible states
      */
-    private synchronized void write() throws IOException, IllegalStateException {
+    synchronized void write() throws IOException, IllegalStateException {
         switch (mode) {
         case WRITE_NEW_WB:
             // check that there are sheets; if not, then no data was written and we do not create this book
@@ -308,7 +309,7 @@ public class ExcelBook implements ITableCollection {
         List<@NonNull ExcelSheetWriter> tmp = new ArrayList<>(openWriters);
         for (ExcelSheetWriter excelSheetWriter : tmp) {
             try {
-                flush(excelSheetWriter);
+                closeWriter(excelSheetWriter);
             } catch (IOException e) {
                 LOGGER.logError("Error while writing sheet: " + e.getMessage());
             }
