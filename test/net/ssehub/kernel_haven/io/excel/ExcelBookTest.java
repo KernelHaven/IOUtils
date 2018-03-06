@@ -61,8 +61,10 @@ public class ExcelBookTest {
             
             ExcelSheetReader reader = book.getReader("Test Sheet");
             
+            assertThat(reader.getLineNumber(), is(0));
             String[][] allRows = reader.readFull();
             assertThat(allRows.length, is(6));
+            assertThat(reader.getLineNumber(), is(6));
             
             List<Group> groupedRows = reader.getGroupedRows();
             Assert.assertEquals(2, groupedRows.size());
@@ -88,9 +90,11 @@ public class ExcelBookTest {
             assertThat(book.getTableNames(), hasItem("Test Sheet"));
             
             ExcelSheetReader reader = book.getReader("Test Sheet");
-            
+
+            assertThat(reader.getLineNumber(), is(0));
             String[][] allRows = reader.readFull();
             assertThat(allRows.length, is(6));
+            assertThat(reader.getLineNumber(), is(6));
             
             List<Group> groups = reader.getRowGroups(0);
             assertThat(groups.size(), is(0));
@@ -134,9 +138,11 @@ public class ExcelBookTest {
             assertThat(book.getTableNames(), hasItem("Test Sheet"));
             
             ExcelSheetReader reader = book.getReader("Test Sheet");
-            
+
+            assertThat(reader.getLineNumber(), is(0));
             String[][] allRows = reader.readFull();
             assertThat(allRows.length, is(6));
+            assertThat(reader.getLineNumber(), is(6));
             
             List<Group> groups = reader.getRowGroups(0);
             assertThat(groups.size(), is(0));
@@ -177,9 +183,11 @@ public class ExcelBookTest {
             assertThat(book.getTableNames(), hasItem("Test Sheet"));
             
             ExcelSheetReader reader = book.getReader("Test Sheet");
-            
+
+            assertThat(reader.getLineNumber(), is(0));
             String[][] allRows = reader.readFull();
             assertThat(allRows.length, is(6));
+            assertThat(reader.getLineNumber(), is(6));
             
             List<Group> groupedRows = reader.getGroupedRows();
             Assert.assertEquals(3, groupedRows.size());
@@ -253,8 +261,10 @@ public class ExcelBookTest {
             assertThat(book.getTableNames(), hasItem(sheetName));
             reader = book.getReader(sheetName);
             Assert.assertNotNull(reader);
-            
+
+            assertThat(reader.getLineNumber(), is(0));
             content = reader.readFull();
+            assertThat(reader.getLineNumber(), is(content.length));
         } catch (IllegalStateException | IOException | FormatException e) {
             Assert.fail(e.getMessage());
         }
@@ -292,7 +302,9 @@ public class ExcelBookTest {
         // Test that correct content was written
         try (ExcelBook writtenBook = new ExcelBook(newWorkbook)) {
             ExcelSheetReader reader = writtenBook.getReader(sheetName);
+            assertThat(reader.getLineNumber(), is(0));
             String[][] content = reader.readFull();
+            assertThat(reader.getLineNumber(), is(1));
             Assert.assertEquals(1, content.length);
             String[] row1 = content[0];
             Assert.assertEquals(2, row1.length);
@@ -343,8 +355,10 @@ public class ExcelBookTest {
         // Test that correct content was written
         try (ExcelBook writtenBook = new ExcelBook(newWorkbook)) {
             ExcelSheetReader reader = writtenBook.getReader(sheetName1);
+            assertThat(reader.getLineNumber(), is(0));
             String[][] content = reader.readFull();
             Assert.assertEquals(1, content.length);
+            assertThat(reader.getLineNumber(), is(1));
             String[] row1 = content[0];
             Assert.assertEquals(2, row1.length);
             Assert.assertEquals("A", row1[0]);
@@ -427,9 +441,18 @@ public class ExcelBookTest {
             assertThat(readers.get(1).getSheetName(), is("Sheet2"));
             assertThat(readers.get(2).getSheetName(), is("Sheet3"));
             
+
+            assertThat(readers.get(0).getLineNumber(), is(0));
             assertThat(readers.get(0).readFull(), is(new String[][] {{"Sheet", "One"}}));
+            assertThat(readers.get(0).getLineNumber(), is(1));
+            
+            assertThat(readers.get(1).getLineNumber(), is(0));
             assertThat(readers.get(1).readFull(), is(new String[][] {{"Sheet", "Two"}}));
+            assertThat(readers.get(1).getLineNumber(), is(1));
+            
+            assertThat(readers.get(2).getLineNumber(), is(0));
             assertThat(readers.get(2).readFull(), is(new String[][] {{"Sheet", "Three"}}));
+            assertThat(readers.get(2).getLineNumber(), is(1));
             
             for (ExcelSheetReader reader : readers) {
                 reader.close();
@@ -449,7 +472,9 @@ public class ExcelBookTest {
     public void testReadEmptySheet() throws IOException, IllegalStateException, FormatException {
         try (ExcelBook book = new ExcelBook(new File("testdata/EmptySheet.xlsx"))) {
             try (ExcelSheetReader reader = book.getReader(0)) {
+                assertThat(reader.getLineNumber(), is(0));
                 assertThat(reader.readFull(), is(new String[0][]));
+                assertThat(reader.getLineNumber(), is(0));
             }
         }
     }
@@ -489,7 +514,9 @@ public class ExcelBookTest {
             writer.close();
 
             ExcelSheetReader reader = book.getReader("Sheet");
+            assertThat(reader.getLineNumber(), is(0));
             assertThat(reader.readFull(), is(new String[][] {{"Other", "Test", "Data"}}));
+            assertThat(reader.getLineNumber(), is(1));
             
         } finally {
             dst.delete();
@@ -508,7 +535,8 @@ public class ExcelBookTest {
     public void testReadDifferentContentTypes() throws IOException, IllegalStateException, FormatException {
         try (ExcelBook book = new ExcelBook(new File("testdata/DifferentContentTypes.xlsx"))) {
             ExcelSheetReader reader = book.getReader(0);
-            
+
+            assertThat(reader.getLineNumber(), is(0));
             assertThat(reader.readFull(), is(new String[][] {
                 {"String", "Text"},
                 {"Numeric", "1.0"},
@@ -517,6 +545,7 @@ public class ExcelBookTest {
                 {"Blank", ""},
                 {"Error", "4/0"},
             }));
+            assertThat(reader.getLineNumber(), is(6));
             
             reader.close();
         }
@@ -547,12 +576,15 @@ public class ExcelBookTest {
             writer.close();
             
             ExcelSheetReader reader = book.getReader("Sheet");
+            assertThat(reader.getLineNumber(), is(0));
             String[] row = reader.readNextRow();
+            assertThat(reader.getLineNumber(), is(1));
             assertThat(row.length, is(2));
             assertThat(row[0].length(), is(SpreadsheetVersion.EXCEL2007.getMaxTextLength()));
             assertThat(row[1].length(), is(200));
 
             assertThat(reader.readNextRow(), nullValue());
+            assertThat(reader.getLineNumber(), is(1));
             
         } finally {
             dst.delete();
@@ -580,7 +612,9 @@ public class ExcelBookTest {
             writer.close();
             
             ExcelSheetReader reader = book.getReader("Sheet");
+            assertThat(reader.getLineNumber(), is(0));
             String[][] content = reader.readFull();
+            assertThat(reader.getLineNumber(), is(5));
             
             assertThat(content, is(new String[][] {
                 {"String", "A String Value"},
@@ -616,7 +650,9 @@ public class ExcelBookTest {
             writer.close();
             
             ExcelSheetReader reader = book.getReader("Sheet");
+            assertThat(reader.getLineNumber(), is(0));
             String[][] content = reader.readFull();
+            assertThat(reader.getLineNumber(), is(4));
             
             assertThat(content, is(new String[][] {
                 {"Context", "Value"},

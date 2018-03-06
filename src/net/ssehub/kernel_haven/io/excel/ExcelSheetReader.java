@@ -42,6 +42,8 @@ public class ExcelSheetReader implements ITableReader {
      */
     private @NonNull Iterator<@NonNull String[]> iterator;
     
+    private int currentRow;
+    
     /**
      * Creates an reader for the given sheet.
      * 
@@ -199,6 +201,7 @@ public class ExcelSheetReader implements ITableReader {
     public void close() {
         // no need to close anything, just reset the iterator
         iterator = notNull(contents.iterator());
+        currentRow = 0;
     }
 
     @Override
@@ -206,10 +209,16 @@ public class ExcelSheetReader implements ITableReader {
         @NonNull String[] result;
         if (iterator.hasNext()) {
             result = iterator.next();
+            currentRow++;
         } else {
             result = null;
         }
         return result;
+    }
+    
+    @Override
+    public int getLineNumber() {
+        return currentRow;
     }
 
 }
