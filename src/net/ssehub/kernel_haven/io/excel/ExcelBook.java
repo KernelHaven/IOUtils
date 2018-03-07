@@ -24,6 +24,7 @@ import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.io.ITableCollection;
 import net.ssehub.kernel_haven.util.io.TableCollectionReaderFactory;
+import net.ssehub.kernel_haven.util.io.TableCollectionWriterFactory;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
@@ -37,10 +38,15 @@ import net.ssehub.kernel_haven.util.null_checks.Nullable;
 public class ExcelBook implements ITableCollection {
     
     static {
-        // this static block is invoked by the infrastructure
-        // TODO: refactor this properly
+        // this static block is invoked by the infrastructure, see loadClasses.txt
+        
+        // register to TableCollectionReaderFactory
         TableCollectionReaderFactory.INSTANCE.registerHandler("xls", ExcelBook.class);
         TableCollectionReaderFactory.INSTANCE.registerHandler("xlsx", ExcelBook.class);
+        
+        // register to TableCollectionWriterFactory
+        TableCollectionWriterFactory.INSTANCE.registerHandler("xls", ExcelBook.class);
+        TableCollectionWriterFactory.INSTANCE.registerHandler("xlsx", ExcelBook.class);
     }
     
     /**
