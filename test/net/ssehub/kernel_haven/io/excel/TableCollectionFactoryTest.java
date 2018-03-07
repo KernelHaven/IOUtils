@@ -25,7 +25,7 @@ public class TableCollectionFactoryTest {
      */
     @Test
     public void testXls() throws IOException {
-        ITableCollection collection = TableCollectionFactory.openFile(new File("test.xls"));
+        ITableCollection collection = TableCollectionFactory.INSTANCE.openFile(new File("test.xls"));
         assertThat(collection, CoreMatchers.instanceOf(ExcelBook.class));
         collection.close();
     }
@@ -37,7 +37,7 @@ public class TableCollectionFactoryTest {
      */
     @Test
     public void testXlsx() throws IOException {
-        ITableCollection collection = TableCollectionFactory.openFile(new File("test.xlsx"));
+        ITableCollection collection = TableCollectionFactory.INSTANCE.openFile(new File("test.xlsx"));
         assertThat(collection, CoreMatchers.instanceOf(ExcelBook.class));
         collection.close();
     }

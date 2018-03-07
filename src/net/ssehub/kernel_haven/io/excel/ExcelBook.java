@@ -39,8 +39,8 @@ public class ExcelBook implements ITableCollection {
     static {
         // this static block is invoked by the infrastructure
         // TODO: refactor this properly
-        TableCollectionFactory.registerHandler("xls", ExcelBook.class);
-        TableCollectionFactory.registerHandler("xlsx", ExcelBook.class);
+        TableCollectionFactory.INSTANCE.registerHandler("xls", ExcelBook.class);
+        TableCollectionFactory.INSTANCE.registerHandler("xlsx", ExcelBook.class);
     }
     
     /**
