@@ -16,7 +16,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import net.ssehub.kernel_haven.io.AllTests;
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
@@ -27,7 +26,10 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  * @author Adam
  */
 public class ExcelBookTest {
-    private static final File TMPFOLDER = new File(AllTests.TESTDATA, "tmpFiles");
+    
+    private static final File TESTDATA = new File("testdata");
+    
+    private static final File TMPFOLDER = new File(TESTDATA, "tmpFiles");
 
     /**
      * Creates the {@link #TMPFOLDER}.
@@ -54,7 +56,7 @@ public class ExcelBookTest {
      */
     @Test
     public void testGroupedRows() throws IllegalStateException, IOException, FormatException {
-        File inputFile = new File(AllTests.TESTDATA, "GroupedValues.xlsx");
+        File inputFile = new File(TESTDATA, "GroupedValues.xlsx");
         
         try (ExcelBook book = new ExcelBook(inputFile, true)) {
             assertThat(book.getTableNames(), hasItem("Test Sheet"));
@@ -84,7 +86,7 @@ public class ExcelBookTest {
      */
     @Test
     public void testGetRowGroups() throws IllegalStateException, IOException, FormatException {
-        File inputFile = new File(AllTests.TESTDATA, "GroupedValues.xlsx");
+        File inputFile = new File(TESTDATA, "GroupedValues.xlsx");
         
         try (ExcelBook book = new ExcelBook(inputFile, true)) {
             assertThat(book.getTableNames(), hasItem("Test Sheet"));
@@ -132,7 +134,7 @@ public class ExcelBookTest {
      */
     @Test
     public void testGetRowGroupsNested() throws IllegalStateException, IOException, FormatException {
-        File inputFile = new File(AllTests.TESTDATA, "GroupedValues2.xlsx");
+        File inputFile = new File(TESTDATA, "GroupedValues2.xlsx");
         
         try (ExcelBook book = new ExcelBook(inputFile, true)) {
             assertThat(book.getTableNames(), hasItem("Test Sheet"));
@@ -177,7 +179,7 @@ public class ExcelBookTest {
      */
     @Test
     public void testGroupedRowsAccess() throws IllegalStateException, IOException, FormatException {
-        File inputFile = new File(AllTests.TESTDATA, "GroupedValues2.xlsx");
+        File inputFile = new File(TESTDATA, "GroupedValues2.xlsx");
         
         try (ExcelBook book = new ExcelBook(inputFile, true)) {
             assertThat(book.getTableNames(), hasItem("Test Sheet"));
@@ -255,7 +257,7 @@ public class ExcelBookTest {
      */
     private String[][] loadSheet(String fileName, @NonNull String sheetName) {
         ExcelSheetReader reader = null;
-        File inputFile = new File(AllTests.TESTDATA, fileName);
+        File inputFile = new File(TESTDATA, fileName);
         String[][] content = null;
         try (ExcelBook book = new ExcelBook(inputFile, true)) {
             assertThat(book.getTableNames(), hasItem(sheetName));

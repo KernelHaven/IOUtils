@@ -12,7 +12,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
     ExcelBookTest.class,
+    TableCollectionUtilsTest.class,
     })
-public class AllExcelTests {
+public class AllTests {
 
 }
