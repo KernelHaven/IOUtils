@@ -23,7 +23,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.io.ITableCollection;
-import net.ssehub.kernel_haven.util.io.TableCollectionFactory;
+import net.ssehub.kernel_haven.util.io.TableCollectionReaderFactory;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
@@ -39,8 +39,8 @@ public class ExcelBook implements ITableCollection {
     static {
         // this static block is invoked by the infrastructure
         // TODO: refactor this properly
-        TableCollectionFactory.INSTANCE.registerHandler("xls", ExcelBook.class);
-        TableCollectionFactory.INSTANCE.registerHandler("xlsx", ExcelBook.class);
+        TableCollectionReaderFactory.INSTANCE.registerHandler("xls", ExcelBook.class);
+        TableCollectionReaderFactory.INSTANCE.registerHandler("xlsx", ExcelBook.class);
     }
     
     /**
