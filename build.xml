@@ -2,7 +2,7 @@
 
 <!-- author: Sascha El-Sharkawy -->
 <project name="IOUtils" default="jenkins" basedir=".">
-	<description>Provides reuseable readers and writers</description>
+	<description>Utilities for reading and writing Excel workbooks</description>
 
 	<!-- Load Marcros on Jenkins -->
 	<include file="../../KernelHaven_Infrastructure/workspace/KernelHavenMacros.xml" as="KH_Common" optional="true" />
@@ -24,4 +24,5 @@
 		<antcall target="KH_Common.prepare.folders" />
 		<get src="${infrastructure.location}" dest="${dependencies.dir}/kernelhaven.jar" />
 	</target>
+
 </project>
