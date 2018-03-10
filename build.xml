@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- author: Sascha El-Sharkawy -->
-<project name="IOUtils" default="jenkins" basedir="." xmlns:jacoco="antlib:org.jacoco.ant" xmlns:cs="antlib:com.puppycrawl.tools.checkstyle.ant">
+<project name="IOUtils" default="jenkins" basedir=".">
 	<description>Provides reuseable readers and writers</description>
+
 	<!-- Load Marcros on Jenkins -->
-	<include file="../../KernelHaven_Infrastructure/workspace/KernelHavenMacros.xml" as="KH_Common" optional="true"/>
+	<include file="../../KernelHaven_Infrastructure/workspace/KernelHavenMacros.xml" as="KH_Common" optional="true" />
 	<!-- Load Marcros in Eclipse -->
-	<include file="../KernelHaven/KernelHavenMacros.xml" as="KH_Common" optional="true"/>
+	<include file="../KernelHaven/KernelHavenMacros.xml" as="KH_Common" optional="true" />
 
 	<target name="jenkins">
 		<antcall target="init" />
