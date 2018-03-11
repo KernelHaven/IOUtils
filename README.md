@@ -1,6 +1,6 @@
 # IOUtils
 
-![Build Status](http://jenkins.sse.uni-hildesheim.de/buildStatus/icon?job=KernelHaven_IOUtils)
+![Build Status](https://jenkins.sse.uni-hildesheim.de/buildStatus/icon?job=KernelHaven_IOUtils)
 
 A utility plugin for [KernelHaven](https://github.com/KernelHaven/KernelHaven).
 
@@ -18,4 +18,4 @@ This plugin has no additional dependencies other than KernelHaven.
 
 ## License
 
-This plugin is licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html).
+This plugin is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0.html).
