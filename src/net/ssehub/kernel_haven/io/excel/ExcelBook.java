@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.poi.POIXMLProperties;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -107,6 +108,9 @@ public class ExcelBook implements ITableCollection {
             if (destinationFile.createNewFile()) {
                 mode = Mode.WRITE_NEW_WB;
                 wb = new XSSFWorkbook();
+                POIXMLProperties xmlProps = ((XSSFWorkbook) wb).getProperties();    
+                POIXMLProperties.CoreProperties coreProps = xmlProps.getCoreProperties();
+                coreProps.setCreator("KernelHaven");
             } else {
                 throw new IOException("Specified file does not exist and could not be created: "
                     + destinationFile.getAbsolutePath());
