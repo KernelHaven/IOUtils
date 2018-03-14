@@ -6,7 +6,10 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -66,6 +69,7 @@ public class ExcelBook implements ITableCollection {
     private static final Logger LOGGER = Logger.get();
     
     private Workbook wb;
+    private POIXMLProperties.CoreProperties wbProperties = null;
     
     private boolean ignoreEmptyRows;
     private Mode mode;
@@ -109,8 +113,8 @@ public class ExcelBook implements ITableCollection {
                 mode = Mode.WRITE_NEW_WB;
                 wb = new XSSFWorkbook();
                 POIXMLProperties xmlProps = ((XSSFWorkbook) wb).getProperties();    
-                POIXMLProperties.CoreProperties coreProps = xmlProps.getCoreProperties();
-                coreProps.setCreator("KernelHaven");
+                wbProperties = xmlProps.getCoreProperties();
+                wbProperties.setCreator("KernelHaven");
             } else {
                 throw new IOException("Specified file does not exist and could not be created: "
                     + destinationFile.getAbsolutePath());
@@ -294,6 +298,20 @@ public class ExcelBook implements ITableCollection {
                 wb.setActiveSheet(0);
                 BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(destinationFile));
                 wb.write(fileOut);
+                
+                if (null != wbProperties) {
+                    String dateOfToday = null;
+                    try {
+                        Date date = Calendar.getInstance().getTime();
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+                        dateOfToday = sdf.format(date);
+                    } catch (NumberFormatException | NullPointerException exc) {
+                        LOGGER.logException("Could not determine date of today", exc);
+                    }
+                    // First sheet is usually named after the most relevant analysis
+                    String title = (null != dateOfToday) ? wb.getSheetName(0) + " " + dateOfToday : wb.getSheetName(0);
+                    wbProperties.setTitle(title);
+                }
             } else {
                 // opening the workbook created an empty file; delete it, since we have no data to write
                 destinationFile.delete();
