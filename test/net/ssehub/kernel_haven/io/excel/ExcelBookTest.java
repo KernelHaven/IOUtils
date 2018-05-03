@@ -297,6 +297,7 @@ public class ExcelBookTest {
         Assert.assertEquals(1, book.getTableNames().size());
         Assert.assertTrue(book.getTableNames().contains(sheetName));
         writer.writeRow("A", "Test");
+        writer.close();
         
         // Write contents to file system
         book.close();
@@ -405,9 +406,9 @@ public class ExcelBookTest {
     @Test
     @SuppressWarnings("null")
     public void testGetFiles() throws IOException, IllegalStateException, FormatException {
-        try (ExcelBook book = new ExcelBook(new File("test.xls"))) {
+        try (ExcelBook book = new ExcelBook(new File("testdata/Existing.xlsx"))) {
             HashSet<File> expected = new HashSet<>();
-            expected.add(new File("test.xls"));
+            expected.add(new File("testdata/Existing.xlsx"));
             assertThat(book.getFiles(), is(expected));
         }
     }

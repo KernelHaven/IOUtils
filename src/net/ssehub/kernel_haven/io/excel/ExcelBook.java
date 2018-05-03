@@ -22,7 +22,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.WorkbookUtil;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.Logger;
@@ -52,6 +52,8 @@ public class ExcelBook implements ITableCollection {
         TableCollectionWriterFactory.INSTANCE.registerHandler("xls", ExcelBook.class);
         TableCollectionWriterFactory.INSTANCE.registerHandler("xlsx", ExcelBook.class);
     }
+    
+    private static final int ROW_WINDOW_SIZE = 10;
     
     /**
      * The read/write mode to open an {@link ExcelBook} with.
@@ -111,10 +113,14 @@ public class ExcelBook implements ITableCollection {
         if (!destinationFile.exists()) {
             if (destinationFile.createNewFile()) {
                 mode = Mode.WRITE_NEW_WB;
-                wb = new XSSFWorkbook();
-                POIXMLProperties xmlProps = ((XSSFWorkbook) wb).getProperties();    
-                wbProperties = xmlProps.getCoreProperties();
-                wbProperties.setCreator("KernelHaven");
+                SXSSFWorkbook wb = new SXSSFWorkbook(ROW_WINDOW_SIZE); 
+                wb.setCompressTempFiles(true);
+                this.wb = wb;
+                
+                // TODO: properties
+//                POIXMLProperties xmlProps = ((XSSFWorkbook) wb).getProperties();    
+//                wbProperties = xmlProps.getCoreProperties();
+//                wbProperties.setCreator("KernelHaven");
             } else {
                 throw new IOException("Specified file does not exist and could not be created: "
                     + destinationFile.getAbsolutePath());
@@ -226,12 +232,6 @@ public class ExcelBook implements ITableCollection {
             if (null == sheet) {
                 String cause = null != exception ? ", cause: " + exception.getMessage() : "";
                 throw new IOException("Could not create sheet \"" + safeName + "\"" + cause);
-//            } else {
-//                /* Add sheets at the front by default
-//                 * This is done to show final results at the beginning of document and intermediate results
-//                 * at the end of document.
-//                 */
-//                wb.setSheetOrder(sheet.getSheetName(), 0);
             }
             
             ExcelSheetWriter writer = new ExcelSheetWriter(this, sheet);
@@ -244,6 +244,11 @@ public class ExcelBook implements ITableCollection {
     public synchronized void close() throws IOException {
         closingLoop();
         write();
+        
+        if (mode == Mode.WRITE_NEW_WB) {
+            ((SXSSFWorkbook) wb).dispose();
+        }
+        
         wb.close();
     }
 
@@ -272,7 +277,8 @@ public class ExcelBook implements ITableCollection {
     }
     
     /**
-     * Allows {@link ExcelSheetWriter}s to write there content (one sheet).
+     * Signals the the given writer is closed.
+     * 
      * @param writer The writer which is closed and calls this method.
      * @throws IOException if the file exists but is a directory rather than a regular file, does not exist but cannot
      *     be created, or cannot be opened for any other reason, or if anything could not be written
@@ -280,7 +286,7 @@ public class ExcelBook implements ITableCollection {
      */
     synchronized void closeWriter(@NonNull ExcelSheetWriter writer) throws IOException, IllegalStateException {
         openWriters.remove(writer);
-        write();
+        // TODO: if we figure out whether we can flush the streaming workbook, do it here
     }
 
     /**
@@ -290,7 +296,7 @@ public class ExcelBook implements ITableCollection {
      *     be created, or cannot be opened for any other reason, or if anything could not be written
      * @throws IllegalStateException If a future version of this class does not consider all possible states
      */
-    synchronized void write() throws IOException, IllegalStateException {
+    private void write() throws IOException, IllegalStateException {
         switch (mode) {
         case WRITE_NEW_WB:
             // check that there are sheets; if not, then no data was written and we do not create this book
@@ -312,10 +318,13 @@ public class ExcelBook implements ITableCollection {
                     String title = (null != dateOfToday) ? wb.getSheetName(0) + " " + dateOfToday : wb.getSheetName(0);
                     wbProperties.setTitle(title);
                 }
+                
+                fileOut.close();
             } else {
                 // opening the workbook created an empty file; delete it, since we have no data to write
                 destinationFile.delete();
             }
+            
             // falls through
         case READ_ONLY:
             break;
