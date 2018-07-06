@@ -303,7 +303,6 @@ public class ExcelBook implements ITableCollection {
             if (wb.getNumberOfSheets() > 0) {
                 wb.setActiveSheet(0);
                 BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(destinationFile));
-                wb.write(fileOut);
                 
                 if (null != wbProperties) {
                     String dateOfToday = null;
@@ -319,6 +318,7 @@ public class ExcelBook implements ITableCollection {
                     wbProperties.setTitle(title);
                 }
                 
+                wb.write(fileOut);
                 fileOut.close();
             } else {
                 // opening the workbook created an empty file; delete it, since we have no data to write

@@ -6,12 +6,18 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.poi.POIXMLProperties;
 import org.apache.poi.ss.SpreadsheetVersion;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -668,6 +674,42 @@ public class ExcelBookTest {
             dst.delete();
         }
         
+    }
+    
+    /**
+     * Tests writing a meta data (author, title, date).
+     * 
+     * @throws IOException unwanted.
+     * @throws FormatException unwanted.
+     */
+    @Test
+    public void testWriteMetadata() throws IOException, FormatException {
+        File dst = new File("testdata/testWriteMetadata.xlsx");
+        String analysisName = "MetaAnalysis";
+
+        dst.delete();
+        Assert.assertFalse(dst.exists());
+        try (ExcelBook book = new ExcelBook(dst)) {
+            
+            ExcelSheetWriter writer = book.getWriter(analysisName);
+            writer.writeHeader("Context", "Value");
+            writer.close();
+            
+        }
+        
+        try (XSSFWorkbook readMetadata = new XSSFWorkbook(new FileInputStream(dst))) {   
+            POIXMLProperties props = readMetadata.getProperties();
+            POIXMLProperties.CoreProperties coreProp = props.getCoreProperties();
+            
+            // Creator
+            Assert.assertEquals("KernelHaven", coreProp.getCreator());
+            
+            // Title: Main analysis name (= 1st sheet) + date (in human readable form (not Adam readable form!))
+            Date date = Calendar.getInstance().getTime();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+            String title = analysisName + " " + sdf.format(date);
+            Assert.assertEquals(title, coreProp.getTitle());
+        }
     }
     
 }
