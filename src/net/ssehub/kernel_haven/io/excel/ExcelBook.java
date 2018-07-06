@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.apache.poi.POIXMLProperties;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -51,6 +52,12 @@ public class ExcelBook implements ITableCollection {
         // register to TableCollectionWriterFactory
         TableCollectionWriterFactory.INSTANCE.registerHandler("xls", ExcelBook.class);
         TableCollectionWriterFactory.INSTANCE.registerHandler("xlsx", ExcelBook.class);
+        
+        /*
+         *  Disable ZipBomb detection as measurement data may allow huge compression.
+         *  See: https://stackoverflow.com/a/44900653 and https://stackoverflow.com/a/46823401
+         */
+        ZipSecureFile.setMinInflateRatio(0);
     }
     
     private static final int ROW_WINDOW_SIZE = 10;
@@ -71,6 +78,7 @@ public class ExcelBook implements ITableCollection {
     private static final Logger LOGGER = Logger.get();
     
     private Workbook wb;
+    private CellStyle headerStyle = null;
     private POIXMLProperties.CoreProperties wbProperties = null;
     
     private boolean ignoreEmptyRows;
@@ -264,15 +272,14 @@ public class ExcelBook implements ITableCollection {
      *     or <tt>null</tt> if this workbook was opened in read only mode.
      */
     synchronized @Nullable CellStyle getHeaderStyle() {
-        CellStyle style = null;
-        if (mode != Mode.READ_ONLY) {
-            style = wb.createCellStyle();
+        if (null == headerStyle && mode != Mode.READ_ONLY) {
+            headerStyle = wb.createCellStyle();
             Font font = wb.createFont();
             font.setBold(true);
-            style.setFont(font);
+            headerStyle.setFont(font);
         }
         
-        return style;
+        return headerStyle;
     }
     
     /**
