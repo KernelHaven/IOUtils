@@ -118,9 +118,9 @@ public class ExcelBook implements ITableCollection {
                 this.wb = wb;
                 
                 // TODO: properties
-//                POIXMLProperties xmlProps = ((XSSFWorkbook) wb).getProperties();    
-//                wbProperties = xmlProps.getCoreProperties();
-//                wbProperties.setCreator("KernelHaven");
+                POIXMLProperties xmlProps = wb.getXSSFWorkbook().getProperties();  
+                wbProperties = xmlProps.getCoreProperties();
+                wbProperties.setCreator("KernelHaven");
             } else {
                 throw new IOException("Specified file does not exist and could not be created: "
                     + destinationFile.getAbsolutePath());
