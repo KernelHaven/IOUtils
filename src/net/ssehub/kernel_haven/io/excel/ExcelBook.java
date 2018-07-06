@@ -117,7 +117,6 @@ public class ExcelBook implements ITableCollection {
                 wb.setCompressTempFiles(true);
                 this.wb = wb;
                 
-                // TODO: properties
                 POIXMLProperties xmlProps = wb.getXSSFWorkbook().getProperties();  
                 wbProperties = xmlProps.getCoreProperties();
                 wbProperties.setCreator("KernelHaven");
