@@ -25,6 +25,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
+import net.ssehub.kernel_haven.config.Configuration;
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.io.ITableCollection;
@@ -366,4 +367,14 @@ public class ExcelBook implements ITableCollection {
             }
         }
     }
+    
+    /**
+     * Initialization method called by KernelHaven. See loadClasses.txt
+     * 
+     * @param config The global pipeline configuration.
+     */
+    public static void initialize(@NonNull Configuration config) {
+        // everything already done in the static block
+    }
+    
 }
