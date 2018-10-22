@@ -80,6 +80,8 @@ public class ExcelBookTest {
             assertGroup(firstGroup, 1, 2);
             Group secondGroup = groupedRows.get(1);
             assertGroup(secondGroup, 4, 5);
+            
+            reader.close();
         }
     }
     
@@ -128,6 +130,8 @@ public class ExcelBookTest {
             
             groups = reader.getRowGroups(6);
             assertThat(groups.size(), is(0));
+            
+            reader.close();
         }
     }
     
@@ -163,6 +167,8 @@ public class ExcelBookTest {
             groups = reader.getRowGroups(3);
             assertThat(groups.size(), is(1));
             assertGroup(groups.get(0), 1, 5);
+            
+            reader.close();
         }
     }
     
@@ -220,6 +226,8 @@ public class ExcelBookTest {
                         + allRows.length + ": " + exc.getMessage());
                 }
             }
+            
+            reader.close();
         }
     }
     
@@ -273,6 +281,7 @@ public class ExcelBookTest {
             assertThat(reader.getLineNumber(), is(0));
             content = reader.readFull();
             assertThat(reader.getLineNumber(), is(content.length));
+            reader.close();
         } catch (IllegalStateException | IOException | FormatException e) {
             Assert.fail(e.getMessage());
         }
@@ -319,7 +328,7 @@ public class ExcelBookTest {
             Assert.assertEquals(2, row1.length);
             Assert.assertEquals("A", row1[0]);
             Assert.assertEquals("Test", row1[1]);
-            writtenBook.close();
+            reader.close();
         }
     }
     
@@ -372,6 +381,7 @@ public class ExcelBookTest {
             Assert.assertEquals(2, row1.length);
             Assert.assertEquals("A", row1[0]);
             Assert.assertEquals("Test", row1[1]);
+            reader.close();
             
             reader = writtenBook.getReader(sheetName2);
             content = reader.readFull();
@@ -384,8 +394,7 @@ public class ExcelBookTest {
             Assert.assertEquals(2, row2.length);
             Assert.assertEquals("With", row2[0]);
             Assert.assertEquals("2 Rows", row2[1]);
-
-            writtenBook.close();
+            reader.close();
         }
     }
     
@@ -594,6 +603,7 @@ public class ExcelBookTest {
 
             assertThat(reader.readNextRow(), nullValue());
             assertThat(reader.getLineNumber(), is(1));
+            reader.close();
             
         } finally {
             dst.delete();
@@ -633,6 +643,7 @@ public class ExcelBookTest {
                 {"Boolean(s)", "true", "false"},
             }));
             
+            reader.close();
         } finally {
             dst.delete();
         }
@@ -670,6 +681,8 @@ public class ExcelBookTest {
                 {"C", "3"},
             }));
             
+            reader.close();
+            
         } finally {
             dst.delete();
         }
@@ -685,6 +698,7 @@ public class ExcelBookTest {
     @Test
     public void testWriteMetadata() throws IOException, FormatException {
         File dst = new File("testdata/testWriteMetadata.xlsx");
+        dst.deleteOnExit();
         String analysisName = "MetaAnalysis";
 
         dst.delete();
