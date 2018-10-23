@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -31,18 +32,27 @@ public class ExcelSheetReader implements ITableReader {
     
     private @NonNull String sheetName;
     
-    private @NonNull List<@NonNull String[]> contents;
-
-    private @NonNull List<@NonNull Group> groupedRows;
+    /**
+     * Caches the result of {@link #getGroupedRows()}. <code>null</code> if not yet called.
+     */
+    private @Nullable List<@NonNull Group> groupedRows;
     
     private boolean ignoreEmptyRows;
     
     /**
-     * The current position for {@link #readNextRow()}. Reset when {@link #close()} is called.
+     * Iterator for the rows in the sheet. Reset when {@link #close()} is called.
      */
-    private @NonNull Iterator<@NonNull String[]> iterator;
+    private @NonNull Iterator<Row> rowIterator;
     
-    private int currentRow;
+    /**
+     * The number of columns we expect. (read from the first row)
+     */
+    private int nColumns;
+    
+    /**
+     * The current row number.
+     */
+    private int currentRowNumber;
     
     /**
      * Creates an reader for the given sheet.
@@ -54,107 +64,12 @@ public class ExcelSheetReader implements ITableReader {
         this.sheet = sheet;
         this.sheetName = notNull(sheet.getSheetName());
         this.ignoreEmptyRows = ignoreEmptyRows;
-        this.contents = new ArrayList<>();
-        this.groupedRows = new ArrayList<>();
         
-        read();
-        
-        this.iterator = notNull(contents.iterator()); 
-    }
-    
-    /**
-     * Reads the full sheet. After this, {@link #contents} is filled.
-     */
-    private void read() {
-        // Retrieves only the number of entries in first column (unsure if this is detailed enough)
-        int nColumns = 0;
+        this.nColumns = 0;
         if (sheet.getRow(0) != null) {
-            nColumns = sheet.getRow(0).getLastCellNum();
+            this.nColumns = sheet.getRow(0).getLastCellNum();
         }
-        Iterator<Row> rowIterator = sheet.rowIterator();
-        Deque<Integer> groupedRows = new ArrayDeque<>();
-        int groupLevel = 0;
-        int previousRow = -1;
-        while (rowIterator.hasNext()) {
-            Row currentRow = rowIterator.next();
-            int currentGroupLevel = currentRow.getOutlineLevel();
-            
-            if (currentGroupLevel != groupLevel) {
-                while (currentGroupLevel > groupLevel) {
-                    // Current row is sub element of the row before
-                    groupedRows.addFirst(previousRow + 1);
-                    groupLevel++;
-                }
-                while (currentGroupLevel < groupLevel) {
-                    // Current row does not belong to the current row anymore, save last grouping
-                    Integer groupingStart = groupedRows.pollFirst();
-                    this.groupedRows.add(new Group(groupingStart, previousRow));
-                    groupLevel--;
-                }
-            }
-            
-            readSingleRow(nColumns, currentRow);
-            
-            previousRow++;
-        }
-        
-        while (groupLevel > 0) {
-            // Group ends at the last line
-            Integer groupingStart = groupedRows.pollFirst();
-            int lastRow = Math.min(previousRow, this.contents.size() - 1);
-            this.groupedRows.add(new Group(groupingStart, lastRow));
-            groupLevel--;
-        }
-    }
-
-    /**
-     * Reads a single row. Called inside {@link #read()}. Adds the result to {@link #contents}.
-     * 
-     * @param nColumns The expected number of columns (used to handle missing cells at the end of row).
-     * @param currentRow The row to read.
-     */
-    private void readSingleRow(int nColumns, @NonNull Row currentRow) {
-        List<String> rowContents = new ArrayList<>();
-        Iterator<Cell> cellIterator = currentRow.iterator();
-        boolean isEmpty = true;
-        while (cellIterator.hasNext()) {
-            Cell currentCell = cellIterator.next();
-            
-            // Handle missing/undefined cells
-            while (currentCell.getColumnIndex() > rowContents.size()) {
-                rowContents.add("");
-            }
-            
-            String value = null;
-            switch (currentCell.getCellTypeEnum()) {
-            case STRING:
-                value = currentCell.getStringCellValue();
-                break;
-            case NUMERIC:
-                value = Double.toString(currentCell.getNumericCellValue());
-                break;
-            case BOOLEAN:
-                value = Boolean.toString(currentCell.getBooleanCellValue());
-                break;
-            case FORMULA:
-                value = currentCell.getCellFormula();
-                break;
-            default: 
-                value = currentCell.getStringCellValue();
-                break;
-            }
-            
-            isEmpty &= value == null;
-            rowContents.add(value);
-        }
-        
-        if (!ignoreEmptyRows || !isEmpty) {
-            // Handle missing/undefined cells at the end of row
-            while (rowContents.size() < nColumns) {
-                rowContents.add("");
-            }
-            this.contents.add(rowContents.toArray(new @NonNull String[0]));
-        }
+        this.rowIterator = notNull(sheet.rowIterator());
     }
     
     /**
@@ -172,7 +87,62 @@ public class ExcelSheetReader implements ITableReader {
      * @return A list containing all {@link Group}s of rows in this sheet.
      */
     public @NonNull List<@NonNull Group> getGroupedRows() {
-        return groupedRows;
+        if (this.groupedRows == null) {
+            // only read group information on-demand
+            List<@NonNull Group> newGroupedRows = new ArrayList<>();
+            
+            Deque<Integer> groupedRows = new ArrayDeque<>();
+            int groupLevel = 0;
+            int previousRow = -1;
+            int lastNonEmptyRow = 0;
+            
+            Iterator<Row> rowIterator = sheet.rowIterator();
+            while (rowIterator.hasNext()) {
+                Row currentRow = rowIterator.next();
+                int currentGroupLevel = currentRow.getOutlineLevel();
+                
+                if (currentGroupLevel != groupLevel) {
+                    while (currentGroupLevel > groupLevel) {
+                        // Current row is sub element of the row before
+                        groupedRows.addFirst(previousRow + 1);
+                        groupLevel++;
+                    }
+                    while (currentGroupLevel < groupLevel) {
+                        // Current row does not belong to the current row anymore, save last grouping
+                        Integer groupingStart = groupedRows.pollFirst();
+                        newGroupedRows.add(new Group(groupingStart, previousRow));
+                        groupLevel--;
+                    }
+                }
+
+                previousRow++;
+                
+                // check if row is empty
+                boolean hasContent = false;
+                Iterator<Cell> cellIterator = currentRow.iterator();
+                while (!hasContent && cellIterator.hasNext()) {
+                    Cell currentCell = cellIterator.next();
+                    if (currentCell.getCellTypeEnum() != CellType.BLANK && !currentCell.toString().isEmpty()) {
+                        hasContent = true;
+                    }
+                }
+                if (hasContent) {
+                    lastNonEmptyRow++;
+                }
+            }
+            
+            while (groupLevel > 0) {
+                // Group ends at the last line
+                Integer groupingStart = groupedRows.pollFirst();
+                int lastRow = Math.min(previousRow, lastNonEmptyRow - 1);
+                newGroupedRows.add(new Group(groupingStart, lastRow));
+                groupLevel--;
+            }
+            
+            this.groupedRows = newGroupedRows;
+        }
+        
+        return notNull(Collections.unmodifiableList(this.groupedRows));
     }
     
     /**
@@ -185,7 +155,7 @@ public class ExcelSheetReader implements ITableReader {
      */
     public @NonNull List<@NonNull Group> getRowGroups(int rowIndex) {
         List<@NonNull Group> relevantGroups = new ArrayList<>();
-        for (Group rowGroup : groupedRows) {
+        for (Group rowGroup : getGroupedRows()) {
             if (rowGroup.getStartIndex() <= rowIndex && rowGroup.getEndIndex() >= rowIndex) {
                 relevantGroups.add(rowGroup);
             }
@@ -200,25 +170,84 @@ public class ExcelSheetReader implements ITableReader {
     @Override
     public void close() {
         // no need to close anything, just reset the iterator
-        iterator = notNull(contents.iterator());
-        currentRow = 0;
+        this.rowIterator = notNull(sheet.rowIterator());
+        currentRowNumber = 0;
     }
 
     @Override
     public @NonNull String @Nullable [] readNextRow() throws IOException {
-        @NonNull String[] result;
-        if (iterator.hasNext()) {
-            result = iterator.next();
-            currentRow++;
-        } else {
-            result = null;
+        @NonNull String[] result = null;
+        
+        List<String> rowContents;
+        boolean isEmpty = true;
+        boolean isEnd = false;
+
+        // don't directly increment this.currentRowNumber
+        // only set the value, if we actually find a non-empty line (this is important at the end of the file)
+        int currentRowNumberCopy = this.currentRowNumber;
+        
+        do {
+            rowContents = new ArrayList<>();
+            
+            if (!this.rowIterator.hasNext()) {
+                isEnd = true; // to break the loop
+                
+            } else {
+                Row currentRow = this.rowIterator.next();
+                currentRowNumberCopy++;
+                
+                Iterator<Cell> cellIterator = currentRow.iterator();
+                while (cellIterator.hasNext()) {
+                    Cell currentCell = cellIterator.next();
+                    
+                    // Handle missing/undefined cells
+                    while (currentCell.getColumnIndex() > rowContents.size()) {
+                        rowContents.add("");
+                    }
+                    
+                    String value = null;
+                    switch (currentCell.getCellTypeEnum()) {
+                    case STRING:
+                        value = currentCell.getStringCellValue();
+                        break;
+                    case NUMERIC:
+                        value = Double.toString(currentCell.getNumericCellValue());
+                        break;
+                    case BOOLEAN:
+                        value = Boolean.toString(currentCell.getBooleanCellValue());
+                        break;
+                    case FORMULA:
+                        value = currentCell.getCellFormula();
+                        break;
+                    default: 
+                        value = currentCell.getStringCellValue();
+                        break;
+                    }
+                    
+                    isEmpty &= value == null;
+                    rowContents.add(value);
+                }
+            }
+            
+        } while (!isEnd && (isEmpty && ignoreEmptyRows));
+        
+        if (!isEnd) {
+            this.currentRowNumber = currentRowNumberCopy;
+            
+            // Handle missing/undefined cells at the end of row
+            while (rowContents.size() < nColumns) {
+                rowContents.add("");
+            }
+            
+            result = rowContents.toArray(new @NonNull String[0]);
         }
+        
         return result;
     }
     
     @Override
     public int getLineNumber() {
-        return currentRow;
+        return currentRowNumber;
     }
 
 }
