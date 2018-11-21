@@ -726,4 +726,51 @@ public class ExcelBookTest {
         }
     }
     
+    /**
+     * Tests reading a sheet with a cell that returns <code>null</code>.
+     * 
+     * @throws IOException unwanted.
+     * @throws FormatException unwanted.
+     */
+    @Test
+    @SuppressWarnings("null")
+    public void testReadNullCell() throws IOException, FormatException {
+        try (ExcelBook book = new ExcelBook(new File("testdata/NullCell.xlsx"));
+                ExcelSheetReader in = book.getReader("Sheet 1")) {
+            
+            assertThat(in.readNextRow(), is(new String[] {"Name", "Value"}));
+            assertThat(in.readNextRow(), is(new String[] {"A", "Val1"}));
+            assertThat(in.readNextRow(), is(new String[] {"B", ""}));
+            assertThat(in.readNextRow(), is(new String[] {"C", "Val3"}));
+        }
+    }
+    
+    /**
+     * Tests writing and reading a sheet with a cell that returns <code>null</code>.
+     * 
+     * @throws IOException unwanted.
+     * @throws FormatException unwanted.
+     */
+    @Test
+    @SuppressWarnings("null")
+    public void testWriteAndReadNullCell() throws IOException, FormatException {
+        try (ExcelBook book = new ExcelBook(new File(TMPFOLDER, "testWriteAndReadNullCell.xlsx"))) {
+            
+            
+            try (ExcelSheetWriter out = book.getWriter("Sheet 1")) {
+                out.writeHeader("Name", "Value");
+                out.writeRow("A", "Val1");
+                out.writeRow("B", null);
+                out.writeRow("C", "Val3");
+            }
+            
+            try (ExcelSheetReader in = book.getReader("Sheet 1")) {
+                assertThat(in.readNextRow(), is(new String[] {"Name", "Value"}));
+                assertThat(in.readNextRow(), is(new String[] {"A", "Val1"}));
+                assertThat(in.readNextRow(), is(new String[] {"B", ""}));
+                assertThat(in.readNextRow(), is(new String[] {"C", "Val3"}));
+            }
+        }
+    }
+    
 }
