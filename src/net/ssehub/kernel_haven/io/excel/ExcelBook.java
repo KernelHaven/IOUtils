@@ -26,7 +26,6 @@ import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import net.ssehub.kernel_haven.config.Configuration;
-import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.io.ITableCollection;
 import net.ssehub.kernel_haven.util.io.TableCollectionReaderFactory;
@@ -95,10 +94,8 @@ public class ExcelBook implements ITableCollection {
      * @param destinationFile An Excel document, which shall be parsed (if existing) or be written (if not existing).
      * 
      * @throws IOException if an error occurs while reading the data
-     * @throws FormatException if the contents of the file cannot be parsed
-     * @throws IllegalStateException If the workbook given is password protected
      */
-    public ExcelBook(@NonNull File destinationFile) throws IOException, IllegalStateException, FormatException {
+    public ExcelBook(@NonNull File destinationFile) throws IOException {
         this(destinationFile, false);
     }
     
@@ -110,11 +107,8 @@ public class ExcelBook implements ITableCollection {
      * @param ignoreEmptyRows <tt>true</tt> empty rows will be skipped, <tt>false</tt> all lines will be read.
      * 
      * @throws IOException if an error occurs while reading the data
-     * @throws FormatException if the contents of the file cannot be parsed
-     * @throws IllegalStateException If the workbook given is password protected
      */
-    public ExcelBook(@NonNull File destinationFile, boolean ignoreEmptyRows) throws IOException, IllegalStateException,
-        FormatException {
+    public ExcelBook(@NonNull File destinationFile, boolean ignoreEmptyRows) throws IOException {
         
         this.ignoreEmptyRows = ignoreEmptyRows;
         this.destinationFile = destinationFile;
@@ -140,8 +134,8 @@ public class ExcelBook implements ITableCollection {
                  * as it has to buffer the whole file.
                  */
                 wb = WorkbookFactory.create(destinationFile, null, true);
-            } catch (InvalidFormatException e) {
-                throw new FormatException(e);
+            } catch (InvalidFormatException | IllegalStateException e) {
+                throw new IOException("Can't open existing workbook", e);
             }
         }
     }

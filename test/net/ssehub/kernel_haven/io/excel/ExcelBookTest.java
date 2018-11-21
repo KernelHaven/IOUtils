@@ -22,7 +22,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
@@ -56,12 +55,10 @@ public class ExcelBookTest {
     /**
      * Tests the correct retrieval of grouped rows.
      * 
-     * @throws IllegalStateException Should not occur, otherwise the tested Excel file is password protected.
      * @throws IOException Should not occur, otherwise the tested Excel document cannot be opened.
-     * @throws FormatException Should not occur, otherwise the tested Excel cannot be parsed
      */
     @Test
-    public void testGroupedRows() throws IllegalStateException, IOException, FormatException {
+    public void testGroupedRows() throws IOException {
         File inputFile = new File(TESTDATA, "GroupedValues.xlsx");
         
         try (ExcelBook book = new ExcelBook(inputFile, true)) {
@@ -88,12 +85,10 @@ public class ExcelBookTest {
     /**
      * Tests the correct retrieval of groups for specified rows.
      * 
-     * @throws IllegalStateException Should not occur, otherwise the tested Excel file is password protected.
      * @throws IOException Should not occur, otherwise the tested Excel document cannot be opened.
-     * @throws FormatException Should not occur, otherwise the tested Excel cannot be parsed
      */
     @Test
-    public void testGetRowGroups() throws IllegalStateException, IOException, FormatException {
+    public void testGetRowGroups() throws IOException {
         File inputFile = new File(TESTDATA, "GroupedValues.xlsx");
         
         try (ExcelBook book = new ExcelBook(inputFile, true)) {
@@ -138,12 +133,10 @@ public class ExcelBookTest {
     /**
      * Tests the correct retrieval of groups for specified rows. This sheet has nested groups
      * 
-     * @throws IllegalStateException Should not occur, otherwise the tested Excel file is password protected.
      * @throws IOException Should not occur, otherwise the tested Excel document cannot be opened.
-     * @throws FormatException Should not occur, otherwise the tested Excel cannot be parsed
      */
     @Test
-    public void testGetRowGroupsNested() throws IllegalStateException, IOException, FormatException {
+    public void testGetRowGroupsNested() throws IOException {
         File inputFile = new File(TESTDATA, "GroupedValues2.xlsx");
         
         try (ExcelBook book = new ExcelBook(inputFile, true)) {
@@ -185,12 +178,11 @@ public class ExcelBookTest {
     
     /**
      * Tests the groups point to existing rows and won't cause {@link IndexOutOfBoundsException}s.
-     * @throws IllegalStateException Should not occur, otherwise the tested Excel file is password protected.
+     * 
      * @throws IOException Should not occur, otherwise the tested Excel document cannot be opened.
-     * @throws FormatException Should not occur, otherwise the tested Excel cannot be parsed
      */
     @Test
-    public void testGroupedRowsAccess() throws IllegalStateException, IOException, FormatException {
+    public void testGroupedRowsAccess() throws IOException {
         File inputFile = new File(TESTDATA, "GroupedValues2.xlsx");
         
         try (ExcelBook book = new ExcelBook(inputFile, true)) {
@@ -282,7 +274,7 @@ public class ExcelBookTest {
             content = reader.readFull();
             assertThat(reader.getLineNumber(), is(content.length));
             reader.close();
-        } catch (IllegalStateException | IOException | FormatException e) {
+        } catch (IOException e) {
             Assert.fail(e.getMessage());
         }
         
@@ -294,11 +286,9 @@ public class ExcelBookTest {
      * Test writing a single sheet.
      * 
      * @throws IOException if an error occurs while reading the data (Must not occur during testing)
-     * @throws FormatException if the contents of the file cannot be parsed (Must not occur during testing)
-     * @throws IllegalStateException If the workbook given is password protected (Must not occur during testing)
      */
     @Test
-    public void testWriteSingleSheet() throws IllegalStateException, IOException, FormatException {
+    public void testWriteSingleSheet() throws IOException {
         File newWorkbook = new File(TMPFOLDER, "testWriteSingleSheet.xlsx");
         Assert.assertFalse(newWorkbook.exists());
         String sheetName = "newSheet";
@@ -336,11 +326,9 @@ public class ExcelBookTest {
      * Tests writing multiple sheets.
      * 
      * @throws IOException if an error occurs while reading the data (Must not occur during testing)
-     * @throws FormatException if the contents of the file cannot be parsed (Must not occur during testing)
-     * @throws IllegalStateException If the workbook given is password protected (Must not occur during testing)
      */
     @Test
-    public void testWriteMultipleSheets() throws IllegalStateException, IOException, FormatException {
+    public void testWriteMultipleSheets() throws IOException {
         File newWorkbook = new File(TMPFOLDER, "testWriteMultipleSheets.xlsx");
         Assert.assertFalse(newWorkbook.exists());
         String sheetName1 = "newSheet1";
@@ -403,11 +391,9 @@ public class ExcelBookTest {
      * book.
      * 
      * @throws IOException unwanted.
-     * @throws FormatException unwanted.
-     * @throws IllegalStateException unwanted.
      */
     @Test
-    public void testOpenAndCloseNonExistingBook() throws IOException, IllegalStateException, FormatException {
+    public void testOpenAndCloseNonExistingBook() throws IOException {
         new ExcelBook(new File("testdata/DoesntExist.xlsx")).close();
     }
     
@@ -415,12 +401,10 @@ public class ExcelBookTest {
      * Tests the {@link ExcelBook#getFiles()} method.
      * 
      * @throws IOException unwanted.
-     * @throws IllegalStateException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test
     @SuppressWarnings("null")
-    public void testGetFiles() throws IOException, IllegalStateException, FormatException {
+    public void testGetFiles() throws IOException {
         try (ExcelBook book = new ExcelBook(new File("testdata/Existing.xlsx"))) {
             HashSet<File> expected = new HashSet<>();
             expected.add(new File("testdata/Existing.xlsx"));
@@ -432,11 +416,9 @@ public class ExcelBookTest {
      * Tests that writing to an existing (and thus read-only) book throws an exception.
      * 
      * @throws IOException unwanted.
-     * @throws IllegalStateException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test(expected = UnsupportedOperationException.class)
-    public void testWriteToExisting() throws IOException, IllegalStateException, FormatException {
+    public void testWriteToExisting() throws IOException {
         try (ExcelBook book = new ExcelBook(new File("testdata/Existing.xlsx"))) {
             book.getWriter("test").close();
         }
@@ -446,12 +428,10 @@ public class ExcelBookTest {
      * Tests that the getAllSheetReaders() method correctly returns all sheet readers.
      * 
      * @throws IOException unwanted.
-     * @throws IllegalStateException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test
     @SuppressWarnings("null")
-    public void testGetAllSheetReaders() throws IOException, IllegalStateException, FormatException {
+    public void testGetAllSheetReaders() throws IOException {
         try (ExcelBook book = new ExcelBook(new File("testdata/MultipleSheets.xlsx"))) {
             List<ExcelSheetReader> readers = book.getAllSheetReaders();
             
@@ -482,12 +462,10 @@ public class ExcelBookTest {
      * Tests that reading an empty sheet works correctly. 
      * 
      * @throws IOException unwanted.
-     * @throws IllegalStateException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test
     @SuppressWarnings("null")
-    public void testReadEmptySheet() throws IOException, IllegalStateException, FormatException {
+    public void testReadEmptySheet() throws IOException {
         try (ExcelBook book = new ExcelBook(new File("testdata/EmptySheet.xlsx"))) {
             try (ExcelSheetReader reader = book.getReader(0)) {
                 assertThat(reader.getLineNumber(), is(0));
@@ -501,11 +479,9 @@ public class ExcelBookTest {
      * Tests that reading an invalid file correctly throws an exception.
      * 
      * @throws IOException wanted.
-     * @throws IllegalStateException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test(expected = IOException.class)
-    public void testReadCorrupted() throws IOException, IllegalStateException, FormatException {
+    public void testReadCorrupted() throws IOException {
         ExcelBook book = new ExcelBook(new File("testdata/Corrupted.xls"));
         book.close();
     }
@@ -514,12 +490,10 @@ public class ExcelBookTest {
      * Tests that trying to create the same sheet (same name) twice is handled correctly.
      * 
      * @throws IOException unwanted.
-     * @throws IllegalStateException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test
     @SuppressWarnings("null")
-    public void testCreateSameSheetTwice() throws IOException, IllegalStateException, FormatException {
+    public void testCreateSameSheetTwice() throws IOException {
         File dst = new File("testdata/tmp.xls");
         try (ExcelBook book = new ExcelBook(dst)) {
             
@@ -545,12 +519,10 @@ public class ExcelBookTest {
      * Tests that the {@link ExcelSheetReader} can handled different content types.
      * 
      * @throws IOException unwanted.
-     * @throws IllegalStateException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test
     @SuppressWarnings("null")
-    public void testReadDifferentContentTypes() throws IOException, IllegalStateException, FormatException {
+    public void testReadDifferentContentTypes() throws IOException {
         try (ExcelBook book = new ExcelBook(new File("testdata/DifferentContentTypes.xlsx"))) {
             ExcelSheetReader reader = book.getReader(0);
 
@@ -573,12 +545,10 @@ public class ExcelBookTest {
      * Tests that writing really long field names is handled correctly.
      * 
      * @throws IOException unwanted.
-     * @throws IllegalStateException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test
     @SuppressWarnings("null")
-    public void testWriteLongField() throws IOException, IllegalStateException, FormatException {
+    public void testWriteLongField() throws IOException {
         File dst = new File("testdata/tmpLongFields.xls");
         final int length = SpreadsheetVersion.EXCEL2007.getMaxTextLength() + 200;
         
@@ -614,10 +584,9 @@ public class ExcelBookTest {
      * Tests that writing different data types gets formatted correctly.
      * 
      * @throws IOException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test
-    public void testWriteDifferentTypes() throws IOException, FormatException {
+    public void testWriteDifferentTypes() throws IOException {
         File dst = new File("testdata/tmpDifferentTypes.xlsx");
         
         try (ExcelBook book = new ExcelBook(dst)) {
@@ -654,10 +623,9 @@ public class ExcelBookTest {
      * Tests writing a header line.
      * 
      * @throws IOException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test
-    public void testWriteHeader() throws IOException, FormatException {
+    public void testWriteHeader() throws IOException {
         File dst = new File("testdata/tmpWriteHeader.xlsx");
         
         try (ExcelBook book = new ExcelBook(dst)) {
@@ -693,10 +661,9 @@ public class ExcelBookTest {
      * Tests writing a meta data (author, title, date).
      * 
      * @throws IOException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test
-    public void testWriteMetadata() throws IOException, FormatException {
+    public void testWriteMetadata() throws IOException {
         File dst = new File("testdata/testWriteMetadata.xlsx");
         dst.deleteOnExit();
         String analysisName = "MetaAnalysis";
@@ -730,11 +697,10 @@ public class ExcelBookTest {
      * Tests reading a sheet with a cell that returns <code>null</code>.
      * 
      * @throws IOException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test
     @SuppressWarnings("null")
-    public void testReadNullCell() throws IOException, FormatException {
+    public void testReadNullCell() throws IOException {
         try (ExcelBook book = new ExcelBook(new File(TESTDATA, "NullCell.xlsx"));
                 ExcelSheetReader in = book.getReader("Sheet 1")) {
             
@@ -749,11 +715,10 @@ public class ExcelBookTest {
      * Tests writing and reading a sheet with a cell that returns <code>null</code>.
      * 
      * @throws IOException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test
     @SuppressWarnings("null")
-    public void testWriteAndReadNullCell() throws IOException, FormatException {
+    public void testWriteAndReadNullCell() throws IOException {
         try (ExcelBook book = new ExcelBook(new File(TMPFOLDER, "testWriteAndReadNullCell.xlsx"))) {
             
             
@@ -777,11 +742,10 @@ public class ExcelBookTest {
      * Tests that ignoreEmptyRows works as expected.
      * 
      * @throws IOException unwanted.
-     * @throws FormatException unwanted.
      */
     @Test
     @SuppressWarnings("null")
-    public void testIgnoreEmptyRows() throws IOException, FormatException {
+    public void testIgnoreEmptyRows() throws IOException {
         // EmptyRows.xlsx contains multiple empty rows, that are inside a row group
         // if the grouping would not be there, the Apache POI library automatically ignores the empty rows
         try (ExcelBook book = new ExcelBook(new File(TESTDATA, "EmptyRows.xlsx"));
