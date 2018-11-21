@@ -191,7 +191,6 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     @Override
     public void flush() throws IOException {
         // don't do anything, we can't flush the streaming workbook
-        // TODO: can we?
     }
 
 }
