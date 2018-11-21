@@ -205,7 +205,7 @@ public class ExcelSheetReader implements ITableReader {
                         rowContents.add("");
                     }
                     
-                    String value = null;
+                    String value;
                     switch (currentCell.getCellTypeEnum()) {
                     case STRING:
                         value = currentCell.getStringCellValue();
@@ -220,6 +220,7 @@ public class ExcelSheetReader implements ITableReader {
                         value = currentCell.getCellFormula();
                         break;
                     default: 
+                        // getStringCellValue() returns "" for empty cells
                         value = currentCell.getStringCellValue();
                         break;
                     }

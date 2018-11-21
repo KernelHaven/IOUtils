@@ -735,7 +735,7 @@ public class ExcelBookTest {
     @Test
     @SuppressWarnings("null")
     public void testReadNullCell() throws IOException, FormatException {
-        try (ExcelBook book = new ExcelBook(new File("testdata/NullCell.xlsx"));
+        try (ExcelBook book = new ExcelBook(new File(TESTDATA, "NullCell.xlsx"));
                 ExcelSheetReader in = book.getReader("Sheet 1")) {
             
             assertThat(in.readNextRow(), is(new String[] {"Name", "Value"}));
@@ -770,6 +770,38 @@ public class ExcelBookTest {
                 assertThat(in.readNextRow(), is(new String[] {"B", ""}));
                 assertThat(in.readNextRow(), is(new String[] {"C", "Val3"}));
             }
+        }
+    }
+    
+    /**
+     * Tests that ignoreEmptyRows works as expected.
+     * 
+     * @throws IOException unwanted.
+     * @throws FormatException unwanted.
+     */
+    @Test
+    @SuppressWarnings("null")
+    public void testIgnoreEmptyRows() throws IOException, FormatException {
+        // EmptyRows.xlsx contains multiple empty rows, that are inside a row group
+        // if the grouping would not be there, the Apache POI library automatically ignores the empty rows
+        try (ExcelBook book = new ExcelBook(new File(TESTDATA, "EmptyRows.xlsx"));
+                ExcelSheetReader in = book.getReader("Sheet 1")) {
+            
+            assertThat(in.readNextRow(), is(new String[] {"Name", "Value"}));
+            assertThat(in.readNextRow(), is(new String[] {"A", "Val1"}));
+            assertThat(in.readNextRow(), is(new String[] {"", ""}));
+            assertThat(in.readNextRow(), is(new String[] {"B", "Val2"}));
+            assertThat(in.readNextRow(), is(new String[] {"", ""}));
+            assertThat(in.readNextRow(), is(new String[] {"C", "Val3"}));
+        }
+        
+        try (ExcelBook book = new ExcelBook(new File(TESTDATA, "EmptyRows.xlsx"), true);
+                ExcelSheetReader in = book.getReader("Sheet 1")) {
+            
+            assertThat(in.readNextRow(), is(new String[] {"Name", "Value"}));
+            assertThat(in.readNextRow(), is(new String[] {"A", "Val1"}));
+            assertThat(in.readNextRow(), is(new String[] {"B", "Val2"}));
+            assertThat(in.readNextRow(), is(new String[] {"C", "Val3"}));
         }
     }
     
