@@ -481,8 +481,42 @@ public class ExcelBookTest {
      * @throws IOException wanted.
      */
     @Test(expected = IOException.class)
-    public void testReadCorrupted() throws IOException {
-        ExcelBook book = new ExcelBook(new File("testdata/Corrupted.xls"));
+    public void testReadCorrupted1() throws IOException {
+        ExcelBook book = new ExcelBook(new File("testdata/Corrupted1.xls"));
+        book.close();
+    }
+    
+    /**
+     * Tests that reading an invalid file correctly throws an exception.
+     * 
+     * @throws IOException wanted.
+     */
+    @Test(expected = IOException.class)
+    public void testReadCorrupted2() throws IOException {
+        ExcelBook book = new ExcelBook(new File("testdata/Corrupted2.xlsx"));
+        book.close();
+    }
+    
+    /**
+     * Tests that reading an invalid file correctly throws an exception.
+     * 
+     * @throws IOException wanted.
+     */
+    @Test(expected = IOException.class)
+    public void testReadNotAfile() throws IOException {
+        ExcelBook book = new ExcelBook(new File("testdata"));
+        book.close();
+    }
+    
+    /**
+     * Tests that reading a password protected file correctly throws an exception.
+     * 
+     * @throws IOException wanted.
+     */
+    @Test(expected = IOException.class)
+    public void testReadPasswordProtected() throws IOException {
+        // password is "test"
+        ExcelBook book = new ExcelBook(new File(TESTDATA, "PasswordProtected.xlsx"));
         book.close();
     }
     

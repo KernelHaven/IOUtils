@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.apache.poi.POIXMLProperties;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JRuntimeException;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -134,7 +135,7 @@ public class ExcelBook implements ITableCollection {
                  * as it has to buffer the whole file.
                  */
                 wb = WorkbookFactory.create(destinationFile, null, true);
-            } catch (InvalidFormatException | IllegalStateException e) {
+            } catch (InvalidFormatException | IllegalStateException | OpenXML4JRuntimeException e) {
                 throw new IOException("Can't open existing workbook", e);
             }
         }
