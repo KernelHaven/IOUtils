@@ -19,3 +19,11 @@ This plugin has no additional dependencies other than KernelHaven.
 ## License
 
 This plugin is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html).
+
+## Used Libraries
+
+The following libraries are used (and bundled in `lib/`) by this plugin:
+
+| Library | Version | License |
+|---------|---------|---------|
+| [Apache POI](https://poi.apache.org/) | [3.17](https://archive.apache.org/dist/poi/release/bin/poi-bin-3.17-20170915.zip) | [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html) |
