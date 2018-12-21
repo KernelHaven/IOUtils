@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.poi.POIXMLProperties;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -22,6 +21,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import net.ssehub.kernel_haven.util.Util;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
@@ -43,7 +43,7 @@ public class ExcelBookTest {
     public static void setUpBeforeClass() {
         if (TMPFOLDER.exists()) {
             try {
-                FileUtils.deleteDirectory(TMPFOLDER);
+                Util.deleteFolder(TMPFOLDER);
             } catch (IOException e) {
                 Assert.fail("Could not clear temp directory: " + TMPFOLDER.getAbsolutePath());
             }
