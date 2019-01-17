@@ -476,6 +476,18 @@ public class ExcelBookTest {
     }
     
     /**
+     * Tests that trying to read a sheet name that doesn't exist correctly throws an exception.
+     * 
+     * @throws IOException wanted.
+     */
+    @Test(expected = IOException.class)
+    public void testReadNotExistingSheetName() throws IOException {
+        try (ExcelBook book = new ExcelBook(new File("testdata/Existing.xlsx"))) {
+            book.getReader("DoesntExist");
+        }
+    }
+    
+    /**
      * Tests that reading an invalid file correctly throws an exception.
      * 
      * @throws IOException wanted.
@@ -801,6 +813,26 @@ public class ExcelBookTest {
             assertThat(in.readNextRow(), is(new String[] {"B", "Val2"}));
             assertThat(in.readNextRow(), is(new String[] {"C", "Val3"}));
         }
+    }
+    
+    /**
+     * Tests closing an {@link ExcelBook} while a writer is still open.
+     * 
+     * @throws IOException unwanted.
+     */
+    @Test
+    public void testCloseWithOpenWriter() throws IOException {
+        File file = new File(TMPFOLDER, "testCloseWithOpenWriter.xlsx");
+        assertThat(file.exists(), is(false));
+        
+        ExcelBook book = new ExcelBook(file);
+        
+        book.getWriter("SomeSheet");
+        
+        book.close();
+        
+        assertThat(file.isFile(), is(true));
+        assertThat(file.length() > 0, is(true));
     }
     
 }
