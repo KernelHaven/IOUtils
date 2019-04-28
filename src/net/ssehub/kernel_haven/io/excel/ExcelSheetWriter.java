@@ -149,7 +149,7 @@ public class ExcelSheetWriter extends AbstractTableWriter {
     
     /**
      * Converts the given fields into {@link CellValue}s.
-     * <br />
+     * <p>
      * Splits text values, which are too long into separate fields to avoid {@link IllegalArgumentException}s.
      * Tries to split values at white space characters.
      * <a href="https://stackoverflow.com/a/31937583">https://stackoverflow.com/a/31937583</a>

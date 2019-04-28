@@ -51,7 +51,7 @@ import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
 /**
  * A wrapper around an excel book. A book contains several sheets. The individual sheets can be accessed through
- * {@link ExcelSheetReader}s, see {@link #getAllSheetReaders()} and {@link #getSheetReader(int)}.
+ * {@link ExcelSheetReader}s, see {@link #getAllSheetReaders()} and {@link #getReader(int)}.
  *
  * @author Adam
  * @author El-Sharkawy
@@ -174,7 +174,7 @@ public class ExcelBook implements ITableCollection {
     /**
      * Returns a reader for the specified sheet.
      * 
-     * @param index Index of the sheet number (0-based physical & logical)
+     * @param index Index of the sheet number (0-based physical and logical)
      * @return A reader for the sheet at the provided index.
      * 
      * @throws IllegalArgumentException if the index is out of range (index
